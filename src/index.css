@@ -1,0 +1,622 @@
+@import "tailwindcss";
+
+@theme {
+  --color-warm-paper: #FAF8F5;
+  --color-warm-paper-alt: #F5F2EB;
+  --color-slate-900: #0F172A;
+  --color-amber-500: #F59E0B;
+  --color-amber-600: #D97706;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+  
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+@layer base {
+  body {
+    background-color: var(--color-warm-paper);
+    color: var(--color-slate-900);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/50 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+
+  .glass-dark {
+    @apply bg-slate-900/70 backdrop-blur-xl border border-slate-700/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+  }
+
+  .clay {
+    @apply bg-[#FAF8F5] rounded-[2.5rem] shadow-[12px_12px_24px_#e3e1df,-12px_-12px_24px_#ffffff] border-4 border-white;
+  }
+
+  .clay-card {
+    @apply bg-white rounded-3xl shadow-[inset_4px_4px_8px_#f0f0f0,inset_-4px_-4px_8px_#ffffff,8px_8px_16px_#e3e1df,-8px_-8px_16px_#ffffff];
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+/* THEME SYSTEM STYLES */
+
+:root {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="glassmorphism"] {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="warm-paper"] {
+  --app-bg: #EAE0D5;
+  --main-bg: #FDFBF7;
+  --main-radius: 1.5rem;
+  --main-border: 1px solid #E5D3B3;
+  --main-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+  --font-family: Georgia, serif;
+}
+
+[data-theme="brutalism"] {
+  --app-bg: #FFDF00;
+  --main-bg: #FFFFFF;
+  --main-radius: 0px;
+  --main-border: 4px solid #000;
+  --main-shadow: 8px 8px 0px 0px #000;
+  --font-family: "Courier New", Courier, monospace;
+}
+
+[data-theme="dark-oled"] {
+  --app-bg: #FFFFFF; /* It will be inverted to black */
+  --main-bg: #FDFDFD; /* Inverted to #020202 */
+  --main-radius: 1rem;
+  --main-border: 1px solid #EEE;
+  --main-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+  --font-family: "SF Mono", Consolas, monospace;
+}
+
+[data-theme="claymorphism"] {
+  --app-bg: #E0E5EC;
+  --main-bg: #E0E5EC;
+  --main-radius: 4rem;
+  --main-border: 2px solid rgba(255,255,255,0.5);
+  --main-shadow: 15px 15px 30px rgba(163,177,198,0.5), -15px -15px 30px rgba(255,255,255,0.8);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.theme-app-bg {
+  background-color: var(--app-bg) !important;
+}
+
+.theme-main-content {
+  background-color: var(--main-bg) !important;
+  border-radius: var(--main-radius) !important;
+  border: var(--main-border) !important;
+  box-shadow: var(--main-shadow) !important;
+}
+
+.theme-font {
+  font-family: var(--font-family) !important;
+}
+
+/* Brutalism specific deep overrides */
+[data-theme="brutalism"] * {
+  border-radius: 0 !important;
+}
+[data-theme="brutalism"] button {
+  border: 3px solid black !important;
+  box-shadow: 4px 4px 0px 0px black !important;
+  transform: none !important;
+  font-weight: 900 !important;
+  background-color: white !important;
+  color: black !important;
+}
+[data-theme="brutalism"] button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 0px 0px 0px 0px black !important;
+}
+[data-theme="brutalism"] .glass, [data-theme="brutalism"] .glass-dark, [data-theme="brutalism"] .clay, [data-theme="brutalism"] .clay-card {
+  background-color: white !important;
+  border: 4px solid black !important;
+  box-shadow: 8px 8px 0px 0px black !important;
+  backdrop-filter: none !important;
+}
+
+/* Warm Paper deep overrides */
+[data-theme="warm-paper"] * {
+  border-color: #E5D3B3 !important;
+}
+[data-theme="warm-paper"] .glass, [data-theme="warm-paper"] .glass-dark, [data-theme="warm-paper"] .clay, [data-theme="warm-paper"] .clay-card {
+  background-color: #FDFBF7 !important;
+  border: 1px solid #E5D3B3 !important;
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.05) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Claymorphism deep overrides */
+[data-theme="claymorphism"] .glass, [data-theme="claymorphism"] .glass-dark, [data-theme="claymorphism"] .clay, [data-theme="claymorphism"] .clay-card {
+  background-color: #E0E5EC !important;
+  border-radius: 3rem !important;
+  box-shadow: inset 6px 6px 12px rgba(163,177,198,0.3), inset -6px -6px 12px rgba(255,255,255,0.8), 8px 8px 16px rgba(163,177,198,0.4) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Dark OLED inversion hack for quick full-site dark mode */
+[data-theme="dark-oled"] body {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #000;
+}
+[data-theme="dark-oled"] img, 
+[data-theme="dark-oled"] video {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+
+:root {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="glassmorphism"] {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="warm-paper"] {
+  --app-bg: #EAE0D5;
+  --main-bg: #FDFBF7;
+  --main-radius: 1.5rem;
+  --main-border: 1px solid #E5D3B3;
+  --main-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+  --font-family: Georgia, serif;
+}
+
+[data-theme="brutalism"] {
+  --app-bg: #FFDF00;
+  --main-bg: #FFFFFF;
+  --main-radius: 0px;
+  --main-border: 4px solid #000;
+  --main-shadow: 8px 8px 0px 0px #000;
+  --font-family: "Courier New", Courier, monospace;
+}
+
+[data-theme="dark-oled"] {
+  --app-bg: #FFFFFF; /* It will be inverted to black */
+  --main-bg: #FDFDFD; /* Inverted to #020202 */
+  --main-radius: 1rem;
+  --main-border: 1px solid #EEE;
+  --main-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+  --font-family: "SF Mono", Consolas, monospace;
+}
+
+[data-theme="claymorphism"] {
+  --app-bg: #E0E5EC;
+  --main-bg: #E0E5EC;
+  --main-radius: 4rem;
+  --main-border: 2px solid rgba(255,255,255,0.5);
+  --main-shadow: 15px 15px 30px rgba(163,177,198,0.5), -15px -15px 30px rgba(255,255,255,0.8);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.theme-app-bg {
+  background-color: var(--app-bg);
+}
+
+.theme-main-content {
+  background-color: var(--main-bg);
+  border-radius: var(--main-radius);
+  border: var(--main-border);
+  box-shadow: var(--main-shadow);
+}
+
+.theme-font {
+  font-family: var(--font-family);
+}
+
+/* Brutalism specific deep overrides */
+[data-theme="brutalism"] * {
+  border-radius: 0 !important;
+}
+[data-theme="brutalism"] button {
+  border: 3px solid black !important;
+  box-shadow: 4px 4px 0px 0px black !important;
+  transform: none !important;
+  font-weight: 900 !important;
+}
+[data-theme="brutalism"] button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 0px 0px 0px 0px black !important;
+}
+[data-theme="brutalism"] .glass, [data-theme="brutalism"] .glass-dark, [data-theme="brutalism"] .clay, [data-theme="brutalism"] .clay-card {
+  background-color: white !important;
+  border: 4px solid black !important;
+  box-shadow: 8px 8px 0px 0px black !important;
+  backdrop-filter: none !important;
+}
+
+/* Warm Paper deep overrides */
+[data-theme="warm-paper"] * {
+  border-color: #E5D3B3 !important;
+}
+[data-theme="warm-paper"] .glass, [data-theme="warm-paper"] .glass-dark, [data-theme="warm-paper"] .clay, [data-theme="warm-paper"] .clay-card {
+  background-color: #FDFBF7 !important;
+  border: 1px solid #E5D3B3 !important;
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.05) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Claymorphism deep overrides */
+[data-theme="claymorphism"] .glass, [data-theme="claymorphism"] .glass-dark, [data-theme="claymorphism"] .clay, [data-theme="claymorphism"] .clay-card {
+  background-color: #E0E5EC !important;
+  border-radius: 3rem !important;
+  box-shadow: inset 6px 6px 12px rgba(163,177,198,0.3), inset -6px -6px 12px rgba(255,255,255,0.8), 8px 8px 16px rgba(163,177,198,0.4) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+}
+
+:root {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="glassmorphism"] {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="warm-paper"] {
+  --app-bg: #EAE0D5;
+  --main-bg: #FDFBF7;
+  --main-radius: 1.5rem;
+  --main-border: 1px solid #E5D3B3;
+  --main-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+  --font-family: Georgia, serif;
+}
+
+[data-theme="brutalism"] {
+  --app-bg: #FFDF00;
+  --main-bg: #FFFFFF;
+  --main-radius: 0px;
+  --main-border: 4px solid #000;
+  --main-shadow: 8px 8px 0px 0px #000;
+  --font-family: "Courier New", Courier, monospace;
+}
+
+[data-theme="dark-oled"] {
+  --app-bg: #FFFFFF; /* It will be inverted to black */
+  --main-bg: #FDFDFD; /* Inverted to #020202 */
+  --main-radius: 1rem;
+  --main-border: 1px solid #EEE;
+  --main-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+  --font-family: "SF Mono", Consolas, monospace;
+}
+
+[data-theme="claymorphism"] {
+  --app-bg: #E0E5EC;
+  --main-bg: #E0E5EC;
+  --main-radius: 4rem;
+  --main-border: 2px solid rgba(255,255,255,0.5);
+  --main-shadow: 15px 15px 30px rgba(163,177,198,0.5), -15px -15px 30px rgba(255,255,255,0.8);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.theme-app-bg {
+  background-color: var(--app-bg);
+}
+
+.theme-main-content {
+  background-color: var(--main-bg);
+  border-radius: var(--main-radius);
+  border: var(--main-border);
+  box-shadow: var(--main-shadow);
+}
+
+.theme-font {
+  font-family: var(--font-family);
+}
+
+/* Brutalism specific deep overrides */
+[data-theme="brutalism"] * {
+  border-radius: 0 !important;
+}
+[data-theme="brutalism"] button {
+  border: 3px solid black !important;
+  box-shadow: 4px 4px 0px 0px black !important;
+  transform: none !important;
+  font-weight: 900 !important;
+}
+[data-theme="brutalism"] button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 0px 0px 0px 0px black !important;
+}
+[data-theme="brutalism"] .glass, [data-theme="brutalism"] .glass-dark, [data-theme="brutalism"] .clay, [data-theme="brutalism"] .clay-card {
+  background-color: white !important;
+  border: 4px solid black !important;
+  box-shadow: 8px 8px 0px 0px black !important;
+  backdrop-filter: none !important;
+}
+
+/* Warm Paper deep overrides */
+[data-theme="warm-paper"] * {
+  border-color: #E5D3B3 !important;
+}
+[data-theme="warm-paper"] .glass, [data-theme="warm-paper"] .glass-dark, [data-theme="warm-paper"] .clay, [data-theme="warm-paper"] .clay-card {
+  background-color: #FDFBF7 !important;
+  border: 1px solid #E5D3B3 !important;
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.05) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Claymorphism deep overrides */
+[data-theme="claymorphism"] .glass, [data-theme="claymorphism"] .glass-dark, [data-theme="claymorphism"] .clay, [data-theme="claymorphism"] .clay-card {
+  background-color: #E0E5EC !important;
+  border-radius: 3rem !important;
+  box-shadow: inset 6px 6px 12px rgba(163,177,198,0.3), inset -6px -6px 12px rgba(255,255,255,0.8), 8px 8px 16px rgba(163,177,198,0.4) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+}
+
+:root {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="glassmorphism"] {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="warm-paper"] {
+  --app-bg: #EAE0D5;
+  --main-bg: #FDFBF7;
+  --main-radius: 1.5rem;
+  --main-border: 1px solid #E5D3B3;
+  --main-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+  --font-family: Georgia, serif;
+}
+
+[data-theme="brutalism"] {
+  --app-bg: #FFDF00;
+  --main-bg: #FFFFFF;
+  --main-radius: 0px;
+  --main-border: 4px solid #000;
+  --main-shadow: 8px 8px 0px 0px #000;
+  --font-family: "Courier New", Courier, monospace;
+}
+
+[data-theme="dark-oled"] {
+  --app-bg: #FFFFFF; /* It will be inverted to black */
+  --main-bg: #FDFDFD; /* Inverted to #020202 */
+  --main-radius: 1rem;
+  --main-border: 1px solid #EEE;
+  --main-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+  --font-family: "SF Mono", Consolas, monospace;
+}
+
+[data-theme="claymorphism"] {
+  --app-bg: #E0E5EC;
+  --main-bg: #E0E5EC;
+  --main-radius: 4rem;
+  --main-border: 2px solid rgba(255,255,255,0.5);
+  --main-shadow: 15px 15px 30px rgba(163,177,198,0.5), -15px -15px 30px rgba(255,255,255,0.8);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.theme-app-bg {
+  background-color: var(--app-bg);
+}
+
+.theme-main-content {
+  background-color: var(--main-bg);
+  border-radius: var(--main-radius);
+  border: var(--main-border);
+  box-shadow: var(--main-shadow);
+}
+
+.theme-font {
+  font-family: var(--font-family);
+}
+
+/* Brutalism specific deep overrides */
+[data-theme="brutalism"] * {
+  border-radius: 0 !important;
+}
+[data-theme="brutalism"] button {
+  border: 3px solid black !important;
+  box-shadow: 4px 4px 0px 0px black !important;
+  transform: none !important;
+  font-weight: 900 !important;
+}
+[data-theme="brutalism"] button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 0px 0px 0px 0px black !important;
+}
+[data-theme="brutalism"] .glass, [data-theme="brutalism"] .glass-dark, [data-theme="brutalism"] .clay, [data-theme="brutalism"] .clay-card {
+  background-color: white !important;
+  border: 4px solid black !important;
+  box-shadow: 8px 8px 0px 0px black !important;
+  backdrop-filter: none !important;
+}
+
+/* Warm Paper deep overrides */
+[data-theme="warm-paper"] * {
+  border-color: #E5D3B3 !important;
+}
+[data-theme="warm-paper"] .glass, [data-theme="warm-paper"] .glass-dark, [data-theme="warm-paper"] .clay, [data-theme="warm-paper"] .clay-card {
+  background-color: #FDFBF7 !important;
+  border: 1px solid #E5D3B3 !important;
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.05) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Claymorphism deep overrides */
+[data-theme="claymorphism"] .glass, [data-theme="claymorphism"] .glass-dark, [data-theme="claymorphism"] .clay, [data-theme="claymorphism"] .clay-card {
+  background-color: #E0E5EC !important;
+  border-radius: 3rem !important;
+  box-shadow: inset 6px 6px 12px rgba(163,177,198,0.3), inset -6px -6px 12px rgba(255,255,255,0.8), 8px 8px 16px rgba(163,177,198,0.4) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+}
+
+:root {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="glassmorphism"] {
+  --app-bg: #F0F2F5;
+  --main-bg: #FFFFFF;
+  --main-radius: 3rem;
+  --main-border: 1px solid white;
+  --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+[data-theme="warm-paper"] {
+  --app-bg: #EAE0D5;
+  --main-bg: #FDFBF7;
+  --main-radius: 1.5rem;
+  --main-border: 1px solid #E5D3B3;
+  --main-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+  --font-family: Georgia, serif;
+}
+
+[data-theme="brutalism"] {
+  --app-bg: #FFDF00;
+  --main-bg: #FFFFFF;
+  --main-radius: 0px;
+  --main-border: 4px solid #000;
+  --main-shadow: 8px 8px 0px 0px #000;
+  --font-family: "Courier New", Courier, monospace;
+}
+
+[data-theme="dark-oled"] {
+  --app-bg: #FFFFFF; /* It will be inverted to black */
+  --main-bg: #FDFDFD; /* Inverted to #020202 */
+  --main-radius: 1rem;
+  --main-border: 1px solid #EEE;
+  --main-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+  --font-family: "SF Mono", Consolas, monospace;
+}
+
+[data-theme="claymorphism"] {
+  --app-bg: #E0E5EC;
+  --main-bg: #E0E5EC;
+  --main-radius: 4rem;
+  --main-border: 2px solid rgba(255,255,255,0.5);
+  --main-shadow: 15px 15px 30px rgba(163,177,198,0.5), -15px -15px 30px rgba(255,255,255,0.8);
+  --font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.theme-app-bg {
+  background-color: var(--app-bg);
+}
+
+.theme-main-content {
+  background-color: var(--main-bg);
+  border-radius: var(--main-radius);
+  border: var(--main-border);
+  box-shadow: var(--main-shadow);
+}
+
+.theme-font {
+  font-family: var(--font-family);
+}
+
+/* Brutalism specific deep overrides */
+[data-theme="brutalism"] * {
+  border-radius: 0 !important;
+}
+[data-theme="brutalism"] button {
+  border: 3px solid black !important;
+  box-shadow: 4px 4px 0px 0px black !important;
+  transform: none !important;
+  font-weight: 900 !important;
+}
+[data-theme="brutalism"] button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 0px 0px 0px 0px black !important;
+}
+[data-theme="brutalism"] .glass, [data-theme="brutalism"] .glass-dark, [data-theme="brutalism"] .clay, [data-theme="brutalism"] .clay-card {
+  background-color: white !important;
+  border: 4px solid black !important;
+  box-shadow: 8px 8px 0px 0px black !important;
+  backdrop-filter: none !important;
+}
+
+/* Warm Paper deep overrides */
+[data-theme="warm-paper"] * {
+  border-color: #E5D3B3 !important;
+}
+[data-theme="warm-paper"] .glass, [data-theme="warm-paper"] .glass-dark, [data-theme="warm-paper"] .clay, [data-theme="warm-paper"] .clay-card {
+  background-color: #FDFBF7 !important;
+  border: 1px solid #E5D3B3 !important;
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.05) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Claymorphism deep overrides */
+[data-theme="claymorphism"] .glass, [data-theme="claymorphism"] .glass-dark, [data-theme="claymorphism"] .clay, [data-theme="claymorphism"] .clay-card {
+  background-color: #E0E5EC !important;
+  border-radius: 3rem !important;
+  box-shadow: inset 6px 6px 12px rgba(163,177,198,0.3), inset -6px -6px 12px rgba(255,255,255,0.8), 8px 8px 16px rgba(163,177,198,0.4) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+}

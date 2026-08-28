@@ -1,0 +1,8 @@
+{
+  "name": "The OMK Office JaaS V1.0 Front-End",
+  "description": "Front-Office industrialisé de The OMK Office basé sur la matrice intégrale Magnificent SG (MSG2) à 75 actes, avec un focus V1 sur JOB as a Service (JaaS 1.0 - $300/an), Master Profile 1-Click et multi-dispatch recruteurs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
