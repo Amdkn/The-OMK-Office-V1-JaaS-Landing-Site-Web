@@ -1,140 +1,291 @@
+import React, { useState, useMemo } from "react"
 import { Button } from "@/src/components/ui/button"
-import { Search, Zap, CheckCircle2, ArrowRight } from "lucide-react"
+import { 
+  Search, BookOpen, Scale, Zap, Calculator, Sparkles, 
+  Layers, PlusCircle, Filter, ArrowRight, ShieldCheck, CheckCircle2
+} from "lucide-react"
+import { PageView, CaseStudyPole } from "../../types"
+import { CASE_STUDIES_DATA, getFeaturedCaseStudy } from "../../data/caseStudiesData"
+import { CaseStudyCard } from "./blog/CaseStudyCard"
+import { CaseStudyDetail } from "./blog/CaseStudyDetail"
+import { CaseStudyGuideModal } from "./blog/CaseStudyGuideModal"
 
-export function BlogPoCView({ onOpenModal }: { onOpenModal: () => void }) {
+interface BlogPoCViewProps {
+  onOpenModal: (serviceId?: string) => void;
+  setCurrentPage?: (page: PageView) => void;
+}
+
+export function BlogPoCView({ onOpenModal, setCurrentPage }: BlogPoCViewProps) {
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>("uscis-noid-45min")
+  const [selectedPole, setSelectedPole] = useState<'ALL' | 1 | 2 | 3>('ALL')
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false)
+
+  // Filtered case studies based on pole and search query
+  const filteredStudies = useMemo(() => {
+    return CASE_STUDIES_DATA.filter(study => {
+      const matchesPole = selectedPole === 'ALL' || study.pole === selectedPole
+      const matchesQuery = searchQuery.trim() === "" || 
+        study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        study.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        study.leadParagraph.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        study.clientReference.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        study.categoryTag.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchesPole && matchesQuery
+    })
+  }, [selectedPole, searchQuery])
+
+  // Current active study for detailed view
+  const activeStudy = useMemo(() => {
+    if (!selectedCaseId) return null
+    return CASE_STUDIES_DATA.find(s => s.id === selectedCaseId) || CASE_STUDIES_DATA[0]
+  }, [selectedCaseId])
+
+  const featuredStudy = useMemo(() => getFeaturedCaseStudy(), [])
+
   return (
     <div className="flex flex-col w-full min-h-screen pb-24 bg-slate-50 font-sans relative overflow-hidden">
-      {/* Background Blobs for Visual Interest */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-200/40 rounded-full blur-3xl mix-blend-multiply animate-blob pointer-events-none"></div>
-      <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-amber-200/40 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000 pointer-events-none"></div>
-      <div className="absolute -bottom-32 left-20 w-[600px] h-[600px] bg-emerald-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-4000 pointer-events-none"></div>
+      {/* Subtle Background Blobs */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-200/40 rounded-full blur-3xl mix-blend-multiply pointer-events-none" />
+      <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-amber-200/40 rounded-full blur-3xl mix-blend-multiply pointer-events-none" />
+      <div className="absolute -bottom-32 left-20 w-[600px] h-[600px] bg-emerald-200/30 rounded-full blur-3xl mix-blend-multiply pointer-events-none" />
 
-      {/* HERO BLOG - Glassmorphism Style */}
-      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 z-10">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="glass inline-flex flex-col sm:flex-row items-center justify-center gap-2 rounded-2xl sm:rounded-full px-5 py-2 mb-10 shadow-sm border border-white">
-            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0"></div>
-            <span className="text-xs sm:text-sm font-bold text-slate-700 tracking-widest uppercase text-center">Étude de Cas / Ingénierie System</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-800 leading-[1.1] mb-8 drop-shadow-sm">
-            Comment l'Architecture 1-Click a Résolu un Recrutement <br className="hidden lg:block"/>
-            <span className="text-blue-600">Non Répertorié</span>
-          </h1>
-          
-          <div className="flex items-center gap-4 text-sm text-slate-500 font-bold tracking-wide uppercase">
-            <span className="flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">OS</div> OMK Office Eng</span>
-            <span className="text-slate-300">•</span>
-            <span className="bg-white/50 px-3 py-1 rounded-full">Temps de lecture : 4 min</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ARTICLE CONTENT */}
-      <article className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-20 space-y-20 relative z-10">
+      {/* ==================================================================== */}
+      {/* TOP HEADER / SEARCH & FILTER BAR                                     */}
+      {/* ==================================================================== */}
+      <div className="relative pt-28 sm:pt-32 z-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full mb-8">
         
-        {/* LE PROBLÈME - Clay Card */}
-        <section id="poc-probleme" className="clay-card rounded-[3rem] p-10 md:p-14">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-14 h-14 rounded-[2rem] bg-red-50 text-red-500 flex items-center justify-center shadow-inner border border-red-100">
-              <Search className="w-6 h-6" />
+        {/* Title & Hub Introduction */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold font-mono uppercase tracking-wider mb-3">
+              <BookOpen className="w-3.5 h-3.5" />
+              Ingénierie & Retours d'Expérience Réels
             </div>
-            <h2 className="text-3xl font-extrabold text-slate-800">Le Problème : L'Angle Mort</h2>
-          </div>
-          <p className="text-xl text-slate-600 leading-relaxed mb-8 font-medium">
-            L'approche traditionnelle du recrutement repose sur des bases de données déclaratives (job boards). Le problème de cette méthode est qu'elle ignore l'immense marché "caché" : les entreprises qui ont un besoin réel mais qui n'ont pas encore formalisé ou publié d'offre en ligne.
-          </p>
-          <div className="p-8 bg-white/60 backdrop-blur-md border border-white rounded-[2rem] shadow-sm">
-            <p className="text-slate-700 font-semibold italic text-lg leading-relaxed">
-              "Notre client recherchait un poste de responsable logistique dans la zone d'Elsmere, KY. Aucun poste n'était publié sur les plateformes classiques, mais le besoin sur le terrain était criant. La bureaucratie ralentissait tout."
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Études de Cas & Actes Déterministes
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl leading-relaxed">
+              Consultez les récits d'exécution de The OMK Office sur les 3 Pôles : résolutions légales d'urgence, création d'entreprises optimisées et dispatch proactif 1-Click.
             </p>
           </div>
-        </section>
 
-        {/* LA RÉSOLUTION - Liquid Style Layout */}
-        <section id="poc-resolution">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-14 h-14 rounded-[2rem] bg-blue-50 text-blue-600 flex items-center justify-center shadow-inner border border-blue-100">
-              <Zap className="w-6 h-6" />
-            </div>
-            <h2 className="text-3xl font-extrabold text-slate-800">La Résolution : Dispatch 1-Click</h2>
+          {/* Action button to open schema guide for adding new case studies */}
+          <div className="flex items-center gap-3 shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsGuideOpen(true)}
+              className="border-slate-300 hover:border-slate-400 bg-white text-slate-700 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm"
+            >
+              <PlusCircle className="w-4 h-4 text-blue-600" />
+              Gabarit Nouvelle Étude de Cas
+            </Button>
+            {selectedCaseId && (
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedCaseId(null)}
+                className="text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+              >
+                Vue Catalogue ({CASE_STUDIES_DATA.length})
+              </Button>
+            )}
           </div>
-          <p className="text-xl text-slate-600 leading-relaxed mb-12 font-medium">
-            Pour contourner cette limite, nous avons utilisé l'infrastructure JaaS (Job as a Service) de The OMK Office. L'opération s'est déroulée en deux temps, entièrement automatisés et sans intervention manuelle.
-          </p>
+        </div>
+
+        {/* Search & Pole Filter Pills */}
+        <div className="pt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           
-          <div className="space-y-6">
-            <div className="glass rounded-[2rem] p-8 border border-white flex gap-6 hover:-translate-y-1 transition-transform duration-300 shadow-sm">
-              <div className="w-12 h-12 rounded-[2rem] bg-slate-900 text-white flex items-center justify-center font-black text-xl shrink-0 shadow-lg">1</div>
-              <div>
-                <h4 className="font-extrabold text-slate-800 text-xl mb-2">Ingestion du Master Profile</h4>
-                <p className="text-slate-600 text-lg font-medium leading-relaxed">Le profil du candidat (compétences, certifications, historique) a été ingéré dans notre Master Database, standardisant ses données pour être lisibles par des systèmes d'IA.</p>
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto">
+            <button
+              onClick={() => setSelectedPole('ALL')}
+              className={`text-xs px-3.5 py-1.5 rounded-lg font-bold transition-all whitespace-nowrap ${
+                selectedPole === 'ALL'
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              Tous ({CASE_STUDIES_DATA.length})
+            </button>
+            <button
+              onClick={() => setSelectedPole(1)}
+              className={`text-xs px-3.5 py-1.5 rounded-lg font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                selectedPole === 1
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Scale className="w-3.5 h-3.5" />
+              Pôle 1 · Légal
+            </button>
+            <button
+              onClick={() => setSelectedPole(2)}
+              className={`text-xs px-3.5 py-1.5 rounded-lg font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                selectedPole === 2
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Pôle 2 · Finance
+            </button>
+            <button
+              onClick={() => setSelectedPole(3)}
+              className={`text-xs px-3.5 py-1.5 rounded-lg font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                selectedPole === 3
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Pôle 3 · Carrière
+            </button>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative min-w-[240px] sm:w-72">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Rechercher par mot-clé, réf..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ==================================================================== */}
+      {/* MAIN VIEW CONTENT : DETAIL READER vs CATALOG OVERVIEW                */}
+      {/* ==================================================================== */}
+      {selectedCaseId && activeStudy ? (
+        <CaseStudyDetail
+          study={activeStudy}
+          allStudies={CASE_STUDIES_DATA}
+          onBack={() => setSelectedCaseId(null)}
+          onSelectStudy={(id) => setSelectedCaseId(id)}
+          onOpenModal={onOpenModal}
+          setCurrentPage={setCurrentPage}
+        />
+      ) : (
+        /* CATALOG OVERVIEW (GRID OF ALL CASE STUDIES) */
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          
+          {/* Featured Hero Box if no search query */}
+          {searchQuery === "" && selectedPole === 'ALL' && featuredStudy && (
+            <div className="mb-10 rounded-3xl bg-slate-900 text-white border border-slate-800 p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="relative z-10 max-w-3xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">
+                    ÉTUDE À LA UNE
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">
+                    {featuredStudy.poleLabel}
+                  </span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-3 leading-tight">
+                  {featuredStudy.title}
+                </h2>
+
+                <p className="text-sm text-slate-300 leading-relaxed mb-6 line-clamp-3">
+                  {featuredStudy.leadParagraph}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-slate-800/80">
+                  <Button
+                    onClick={() => setSelectedCaseId(featuredStudy.id)}
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-600/30"
+                  >
+                    Lire l'Étude d'Exécution
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+
+                  <div className="flex items-center gap-4 text-xs font-mono text-slate-400">
+                    <div>
+                      <span className="block text-[10px] uppercase text-slate-500">Temps</span>
+                      <span className="font-bold text-emerald-400">{featuredStudy.highlightMetric.value}</span>
+                    </div>
+                    <div className="border-l border-slate-800 pl-4">
+                      <span className="block text-[10px] uppercase text-slate-500">Protocole</span>
+                      <span className="font-bold text-slate-200">{featuredStudy.protocol}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="glass rounded-[2rem] p-8 border border-white flex gap-6 hover:-translate-y-1 transition-transform duration-300 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
-              <div className="w-12 h-12 rounded-[2rem] bg-slate-900 text-white flex items-center justify-center font-black text-xl shrink-0 shadow-lg relative z-10">2</div>
-              <div className="relative z-10">
-                <h4 className="font-extrabold text-slate-800 text-xl mb-2">Analyse Cadastrale (Geo-Skip Tracing)</h4>
-                <p className="text-slate-600 text-lg font-medium leading-relaxed">Le système a scanné la zone cible via l'API Google Maps et les données locales pour identifier tous les entrepôts de plus de 50 000 sq ft, indépendamment des offres actives.</p>
-              </div>
+          {/* Cards Grid */}
+          <div className="mb-6 flex items-center justify-between">
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 font-mono">
+              {filteredStudies.length} {filteredStudies.length > 1 ? "Études d'Exécution Disponibles" : "Étude d'Exécution Disponible"}
+            </h3>
+          </div>
+
+          {filteredStudies.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredStudies.map((study) => (
+                <CaseStudyCard
+                  key={study.id}
+                  study={study}
+                  onSelect={(id) => setSelectedCaseId(id)}
+                  isSelected={study.id === selectedCaseId}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-md mx-auto">
+              <BookOpen className="w-8 h-8 text-slate-400 mx-auto mb-3" />
+              <h4 className="text-base font-bold text-slate-900 mb-1">Aucune étude ne correspond</h4>
+              <p className="text-xs text-slate-500 mb-4">
+                Essayez d'autres mots-clés ou réinitialisez le filtre par pôle.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelectedPole('ALL')
+                  setSearchQuery("")
+                }}
+                className="text-xs font-bold"
+              >
+                Réinitialiser les filtres
+              </Button>
+            </div>
+          )}
+
+          {/* Bottom Extensibility Callout */}
+          <div className="mt-16 p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <span className="text-[10px] uppercase font-black tracking-widest text-blue-600 font-mono block mb-1">
+                ARCHITECTURE DATA-DRIVEN
+              </span>
+              <h4 className="text-base font-black text-slate-900 mb-1">
+                Structure prête pour l'ajout continu de nouvelles études de cas
+              </h4>
+              <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
+                Toutes les études de cas sont alimentées par une base de données typée (<code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-800">src/data/caseStudiesData.ts</code>). Les nouveaux cas d'ingénierie légale, comptable ou de carrière s'intègrent automatiquement dans les filtres, le moteur de recherche et les inspecteurs interactifs.
+              </p>
             </div>
 
-            <div className="glass rounded-[2rem] p-8 border border-white flex gap-6 hover:-translate-y-1 transition-transform duration-300 shadow-sm">
-              <div className="w-12 h-12 rounded-[2rem] bg-slate-900 text-white flex items-center justify-center font-black text-xl shrink-0 shadow-lg">3</div>
-              <div>
-                <h4 className="font-extrabold text-slate-800 text-xl mb-2">Dispatch Instantané & Asynchrone</h4>
-                <p className="text-slate-600 text-lg font-medium leading-relaxed">Le Master Profile a été formaté et expédié aux décideurs (RH, Opérations) de 38 entrepôts identifiés en une seule passe d'exécution.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* RÉSULTATS - Neo Brutalism Stats */}
-        <section id="poc-resultats" className="pt-8">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-14 h-14 rounded-[2rem] bg-emerald-50 text-emerald-500 flex items-center justify-center shadow-inner border border-emerald-100">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <h2 className="text-3xl font-extrabold text-slate-800">Résultats Méthodologiques</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-slate-900 p-8 rounded-[2rem] text-center shadow-[0_20px_40px_rgba(15,23,42,0.2)] border border-slate-800 relative overflow-hidden group hover:scale-105 transition-transform">
-              <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 to-transparent blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="block text-5xl font-black text-emerald-400 mb-3 relative z-10">{'<'} 3m</span>
-              <span className="text-xs text-slate-400 font-bold uppercase tracking-widest relative z-10">Latence Dispatch</span>
-            </div>
-            
-            <div className="bg-slate-900 p-8 rounded-[2rem] text-center shadow-[0_20px_40px_rgba(15,23,42,0.2)] border border-slate-800 relative overflow-hidden group hover:scale-105 transition-transform">
-              <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-transparent blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="block text-5xl font-black text-blue-400 mb-3 relative z-10">38</span>
-              <span className="text-xs text-slate-400 font-bold uppercase tracking-widest relative z-10">Entrepôts Touchés</span>
-            </div>
-            
-            <div className="bg-slate-900 p-8 rounded-[2rem] text-center shadow-[0_20px_40px_rgba(15,23,42,0.2)] border border-slate-800 relative overflow-hidden group hover:scale-105 transition-transform">
-              <div className="absolute -inset-2 bg-gradient-to-r from-amber-500/20 to-transparent blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <span className="block text-5xl font-black text-amber-400 mb-3 relative z-10">1</span>
-              <span className="text-xs text-slate-400 font-bold uppercase tracking-widest relative z-10">Entretien (24h)</span>
-            </div>
-          </div>
-          
-          <p className="text-xl text-slate-600 leading-relaxed mb-12 font-medium">
-            En déplaçant l'effort de la recherche passive (formulaires) vers la proposition proactive de valeur, The OMK Office prouve que l'ingénierie et l'automatisation remplacent avantageusement la bureaucratie du recrutement.
-          </p>
-          
-          <div className="clay-card rounded-[3rem] p-12 text-center bg-gradient-to-b from-blue-50 to-white border border-white">
-            <h3 className="text-3xl font-black text-slate-800 mb-4">L'Infrastructure travaille pour vous.</h3>
-            <p className="text-lg text-slate-600 mb-8 font-medium max-w-xl mx-auto">Rejoignez le programme JaaS et activez la distribution instantanée de votre profil.</p>
-            <Button onClick={onOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-16 px-10 text-lg rounded-full shadow-[0_10px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-transform w-full sm:w-auto">
-              Découvrir le Pack JOB (JaaS)
-              <ArrowRight className="ml-2 w-5 h-5" />
+            <Button
+              onClick={() => setIsGuideOpen(true)}
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl shrink-0"
+            >
+              Consulter le Guide d'Ajout
             </Button>
           </div>
-        </section>
+        </div>
+      )}
 
-      </article>
+      {/* Guide Modal for Adding New Case Studies */}
+      <CaseStudyGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
     </div>
   )
 }

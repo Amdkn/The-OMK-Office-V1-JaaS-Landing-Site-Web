@@ -51,7 +51,7 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     title: "OUTILS & LABS",
     items: [
-      { id: 'blog-poc', label: 'Étude de Cas (Blog)', icon: BookOpen, desc: 'Dispatch Recruteurs PoC' },
+      { id: 'blog-poc', label: 'Études de Cas (3 Pôles)', icon: BookOpen, desc: 'Récits d\'Exécution & PoC Réels' },
       { id: 'mobile-os', label: 'Mobile OS (Maquette)', icon: Smartphone, desc: 'Portail Login Mobile' },
     ]
   }

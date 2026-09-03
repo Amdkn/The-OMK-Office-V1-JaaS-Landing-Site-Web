@@ -4,10 +4,13 @@ import {
   MessageSquare, DollarSign, Briefcase, Cpu, Settings, 
   Bell, Sparkles, CheckCircle2, ArrowLeft, ChevronRight, 
   Send, Battery, Wifi, Signal, Flame, Award, Activity, 
-  Server, Terminal, Shield, KeyRound, Check, RefreshCw
+  Server, Terminal, Shield, KeyRound, Check, RefreshCw,
+  Scale, FileCheck, AlertTriangle
 } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { useLanguage } from "../../contexts/LanguageContext"
+import { LegalVaultApp } from "../mobile/LegalVaultApp"
+import { appEventBus } from "@/src/lib/appEventBus"
 
 interface SessionState {
   role: 'founder' | 'baas_partner' | 'paas_operator';
@@ -72,24 +75,33 @@ export function MobileOSView() {
   const [notifications, setNotifications] = useState([
     {
       id: 1,
+      app: "Legal Vault (Pôle 1)",
+      time: "Il y a 1 min",
+      title: "Rejet USCIS NOID Neutralisé",
+      desc: "Pack 23 pages certifié & BAT validé (Affaire Lelo-Mumbanda).",
+      icon: Scale,
+      color: "bg-blue-600"
+    },
+    {
+      id: 2,
       app: "Agent OMK OS",
-      time: "Il y a 2 min",
+      time: "Il y a 5 min",
       title: "Rapprochement bancaire complété",
       desc: "32 flux comptables validés sans anomalie.",
       icon: Sparkles,
       color: "bg-blue-500"
     },
     {
-      id: 2,
+      id: 3,
       app: "Registre BaaS",
-      time: "Il y a 10 min",
+      time: "Il y a 12 min",
       title: "Seuil Règle des 5 atteint",
       desc: "5 entreprises parrainées : Forfait $720 amorti à 100% (+$30 Net).",
       icon: DollarSign,
       color: "bg-emerald-500"
     },
     {
-      id: 3,
+      id: 4,
       app: "Solarpunk PaaS Node",
       time: "Il y a 30 min",
       title: "Micro-service local actif",
@@ -98,6 +110,83 @@ export function MobileOSView() {
       color: "bg-amber-500"
     }
   ])
+
+  // Terminal Realtime Logs
+  const [terminalLogs, setTerminalLogs] = useState<string[]>([
+    "[09:41:02] INIT OMK-RUNTIME v2.4",
+    "[09:41:03] Express Server bound on 0.0.0.0:3000",
+    "[09:41:05] Auth JWT Verified: OK",
+    "[09:41:08] BaaS Ledger Check: 5 referrals valid",
+    "[09:41:10] Solarpunk Worker 01 listening...",
+    "[09:41:12] Heartbeat OK · Latency: 12ms",
+    "[09:41:15] Legal Vault SOP-LD05 Engine Online · 8 CFR § 103.2(b)(3) Mirror Ready"
+  ])
+
+  // AppEventBus Listener for Native Mobile Apps
+  useEffect(() => {
+    const unbindIntake = appEventBus.subscribe('EVENT_INTAKE_BATCH_LOADED', (event) => {
+      setTerminalLogs(prev => [
+        ...prev, 
+        `[${event.timestamp}] [LEGAL_VAULT] Intake Souverain: ${event.data.fileCount} pièces brutes SHA-256 (Air-Gapped P2P)`
+      ])
+      setNotifications(prev => [
+        {
+          id: Date.now(),
+          app: "Legal Vault",
+          time: "À l'instant",
+          title: "Intake Souverain Chargé",
+          desc: `${event.data.fileCount} pièces ingérées sans fuite cloud.`,
+          icon: Scale,
+          color: "bg-blue-600"
+        },
+        ...prev
+      ])
+    })
+
+    const unbindChrono = appEventBus.subscribe('EVENT_CHRONO_VALIDATED', (event) => {
+      setTerminalLogs(prev => [
+        ...prev, 
+        `[${event.timestamp}] [CHRONO_MATRIX] Continuité ${event.data.calculatedIntervalMonths} mois validée (INA § 204.2 ≥ 24m) · 0 rupture`
+      ])
+      setNotifications(prev => [
+        {
+          id: Date.now(),
+          app: "Legal Vault",
+          time: "À l'instant",
+          title: "Continuité 30 Mois Validée",
+          desc: "Seuil statutaire INA dépassé (+6 mois). Ruptures : 0 jour.",
+          icon: ShieldCheck,
+          color: "bg-emerald-600"
+        },
+        ...prev
+      ])
+    })
+
+    const unbindBrief = appEventBus.subscribe('EVENT_LEGAL_BRIEF_COMPILED', (event) => {
+      setTerminalLogs(prev => [
+        ...prev, 
+        `[${event.timestamp}] [USCIS_BAT] Pack ${event.data.pagesCount}p compilé · Sceau Notarié O. Kounta · BAT Validé 100%`
+      ])
+      setNotifications(prev => [
+        {
+          id: Date.now(),
+          app: "Legal Vault",
+          time: "À l'instant",
+          title: "Pack 23 Pages Prêt pour Expédition",
+          desc: "1 seul BAT validé. Zéro retirage.",
+          icon: FileCheck,
+          color: "bg-indigo-600"
+        },
+        ...prev
+      ])
+    })
+
+    return () => {
+      unbindIntake()
+      unbindChrono()
+      unbindBrief()
+    }
+  }, [])
 
   // Live Clock Updater
   useEffect(() => {
@@ -324,6 +413,42 @@ export function MobileOSView() {
                     </div>
                   )}
 
+                  {/* WIDGET CRITIQUE LOCKSCREEN : STATUT DOSSIERS NOID / RFE */}
+                  <div 
+                    onClick={() => {
+                      setIsUnlocked(true)
+                      setActiveSystemApp('legal-vault')
+                      setSession(prev => ({ ...prev, status: 'authenticated' }))
+                    }}
+                    className="bg-slate-900/90 border border-emerald-500/50 hover:border-emerald-400 p-3 rounded-2xl backdrop-blur-md shadow-xl text-left cursor-pointer transition-all hover:scale-[1.02] group my-2"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1.5 text-[9px] font-bold text-amber-400 font-mono uppercase">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>STATUT DOSSIERS NOID / RFE</span>
+                      </div>
+                      <span className="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/40">
+                        45 MIN
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-black text-white">
+                        USCIS I-130 Adoption (Affaire Lelo-Mumbanda)
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+
+                    <div className="text-[10px] text-emerald-300 font-semibold mt-1 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>✓ NOID Neutralisé · Échéance 08/09/2026 sauvée</span>
+                    </div>
+                    
+                    <div className="text-[9px] text-slate-400 font-mono mt-1">
+                      Garde &gt;2 ans · Cohabitation 30m · 8 CFR § 103.2(b)(3)
+                    </div>
+                  </div>
+
                   {/* Push Notifications Carousel */}
                   <div className="flex flex-col gap-2 my-2">
                     {notifications.slice(0, 2).map((n) => (
@@ -473,6 +598,20 @@ export function MobileOSView() {
                       {/* SYSTEM WIDGETS & INTERNAL HUBS GRID */}
                       <div className="grid grid-cols-4 gap-3 my-4">
                         
+                        {/* Widget 0: Legal Vault (Pôle 1 Légal) */}
+                        <button
+                          onClick={() => setActiveSystemApp('legal-vault')}
+                          className="flex flex-col items-center gap-1 group"
+                        >
+                          <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/40 group-hover:scale-105 transition-transform relative">
+                            <Scale className="w-6 h-6" />
+                            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-950 flex items-center justify-center">
+                              <Check className="w-2 h-2 text-slate-950 stroke-[3]" />
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-semibold text-slate-200 truncate">Legal Vault</span>
+                        </button>
+
                         {/* Widget 1: Assistant OMK */}
                         <button
                           onClick={() => setActiveSystemApp('ai-chat')}
@@ -551,24 +690,17 @@ export function MobileOSView() {
                           <span className="text-[10px] font-semibold text-slate-200">Alertes</span>
                         </button>
 
-                        {/* Widget 8: Re-verrouiller */}
-                        <button
-                          onClick={() => {
-                            setIsUnlocked(false)
-                            setSession(prev => ({ ...prev, status: 'locked' }))
-                          }}
-                          className="flex flex-col items-center gap-1 group"
-                        >
-                          <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 shadow-lg group-hover:scale-105 transition-transform">
-                            <Lock className="w-6 h-6" />
-                          </div>
-                          <span className="text-[10px] font-semibold text-slate-200">Lock</span>
-                        </button>
-
                       </div>
 
                       {/* BOTTOM APP DOCK */}
                       <div className="bg-white/10 backdrop-blur-xl border border-white/15 p-2 rounded-[28px] flex items-center justify-around shadow-2xl mt-auto">
+                        <button 
+                          onClick={() => setActiveSystemApp('legal-vault')} 
+                          className={`p-2.5 rounded-2xl transition-transform ${activeSystemApp === 'legal-vault' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-blue-600 text-white shadow-md hover:scale-105'}`}
+                          title="Legal Vault (Pôle 1)"
+                        >
+                          <Scale className="w-5 h-5" />
+                        </button>
                         <button onClick={() => setActiveSystemApp('ai-chat')} className="p-2.5 rounded-2xl bg-blue-500 text-white shadow-md">
                           <MessageSquare className="w-5 h-5" />
                         </button>
@@ -588,7 +720,7 @@ export function MobileOSView() {
                     <div className="flex-1 flex flex-col h-full bg-slate-900 rounded-3xl p-4 border border-white/10 overflow-hidden">
                       
                       {/* Header Widget */}
-                      <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+                      <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3 shrink-0">
                         <button 
                           onClick={() => setActiveSystemApp(null)}
                           className="flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300"
@@ -597,10 +729,15 @@ export function MobileOSView() {
                           <span>Hub Principal</span>
                         </button>
                         <span className="text-xs font-bold text-white uppercase tracking-wider">
-                          {activeSystemApp.replace('-widget', '').replace('-app', '')}
+                          {activeSystemApp === 'legal-vault' ? 'Legal Vault' : activeSystemApp.replace('-widget', '').replace('-app', '')}
                         </span>
                         <div className="w-4"></div>
                       </div>
+
+                      {/* Legal Vault Native App (Pôle 1 Légal) */}
+                      {activeSystemApp === 'legal-vault' && (
+                        <LegalVaultApp onClose={() => setActiveSystemApp(null)} />
+                      )}
 
                       {/* OMK AI Chat Dialog */}
                       {activeSystemApp === 'ai-chat' && (
@@ -765,12 +902,11 @@ export function MobileOSView() {
                       {/* Widget: Terminal Log */}
                       {activeSystemApp === 'terminal-widget' && (
                         <div className="flex-1 bg-black p-3 rounded-2xl font-mono text-[10px] text-emerald-400 overflow-y-auto space-y-1">
-                          <p className="text-slate-500">[09:41:02] INIT OMK-RUNTIME v2.4</p>
-                          <p>[09:41:03] Express Server bound on 0.0.0.0:3000</p>
-                          <p>[09:41:05] Auth JWT Verified: {session.token}</p>
-                          <p>[09:41:08] BaaS Ledger Check: 5 referrals valid</p>
-                          <p>[09:41:10] Solarpunk Worker 01 listening...</p>
-                          <p className="text-blue-400">[09:41:12] Heartbeat OK · Latency: 12ms</p>
+                          {terminalLogs.map((log, i) => (
+                            <p key={i} className={log.includes('LEGAL_VAULT') || log.includes('USCIS') ? 'text-blue-400 font-bold' : log.includes('CHRONO') ? 'text-amber-300 font-bold' : ''}>
+                              {log}
+                            </p>
+                          ))}
                         </div>
                       )}
 
@@ -950,6 +1086,22 @@ export function MobileOSView() {
                 </div>
                 <div className="text-base font-black text-white">+$30.00 Net</div>
                 <p className="text-[11px] text-slate-500 mt-1">5 entreprises x $150 = $750</p>
+              </div>
+
+              <div className="bg-slate-900/80 p-4 rounded-2xl border border-blue-500/40 col-span-1 sm:col-span-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-blue-400 font-bold flex items-center gap-1.5">
+                    <Scale className="w-3.5 h-3.5" />
+                    <span>Pôle 1 : Legal Vault (SOP-LD05-OPS-001)</span>
+                  </span>
+                  <span className="text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                    45 MIN CHRONO
+                  </span>
+                </div>
+                <div className="text-base font-black text-white">USCIS Notice of Intent to Deny (NOID)</div>
+                <p className="text-[11px] text-slate-300 mt-1">
+                  Conformité Miroir 8 CFR § 103.2(b)(3) · Cohabitation 30 mois sans jour de carence · Un seul BAT validé.
+                </p>
               </div>
 
             </div>

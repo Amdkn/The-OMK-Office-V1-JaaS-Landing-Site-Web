@@ -160,7 +160,7 @@ export default function App() {
       case 'paas':
         return <PaaSView onOpenModal={handleOpenModal} />
       case 'blog-poc':
-        return <BlogPoCView onOpenModal={handleOpenModal} />
+        return <BlogPoCView onOpenModal={handleOpenModal} setCurrentPage={setCurrentPage} />
       case 'mobile-os':
         return <MobileOSView />
       default:

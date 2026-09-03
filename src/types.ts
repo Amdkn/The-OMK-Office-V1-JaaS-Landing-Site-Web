@@ -61,3 +61,103 @@ export interface CandidateMasterProfile {
   referralCode: string;
   referralCount: number;
 }
+
+export type CaseStudyPole = 1 | 2 | 3 | 'jaas' | 'baas' | 'paas';
+
+export interface CaseStudyMetric {
+  value: string;
+  label: string;
+  description: string;
+  accentColor?: 'emerald' | 'blue' | 'amber';
+}
+
+export interface CaseStudyComparativeRow {
+  criterion: string;
+  traditional: string;
+  omk: string;
+}
+
+export interface CaseStudyInspectorTab {
+  id: string;
+  label: string;
+  originalTitle: string;
+  originalMeta: string;
+  originalContent: string;
+  originalStatus: string;
+  resolvedTitle: string;
+  resolvedMeta: string;
+  resolvedContent: string;
+  resolvedStatus: string;
+  rawJson?: Record<string, any>;
+}
+
+export interface CaseStudy {
+  id: string;
+  pole: CaseStudyPole;
+  poleLabel: string;
+  categoryTag: string;
+  title: string;
+  subtitle: string;
+  leadParagraph: string;
+  clientReference: string;
+  protocol: string;
+  readTime: string;
+  date: string;
+  isFeatured?: boolean;
+  author: {
+    name: string;
+    role: string;
+    initials: string;
+  };
+  highlightMetric: {
+    value: string;
+    label: string;
+  };
+  problem: {
+    title: string;
+    summary: string;
+    quote?: string;
+    breakdownTitle: string;
+    breakdownItems: { title: string; desc: string }[];
+    traditionalFirmComparison?: {
+      title: string;
+      desc: string;
+    };
+  };
+  resolution: {
+    title: string;
+    summary: string;
+    steps: {
+      number: number;
+      title: string;
+      tag: string;
+      description: string;
+    }[];
+    interactiveInspector?: {
+      title: string;
+      subtitle: string;
+      badge: string;
+      tabs: CaseStudyInspectorTab[];
+    };
+  };
+  results: {
+    title: string;
+    metrics: CaseStudyMetric[];
+    summary: string;
+    comparativeTable?: {
+      title: string;
+      caseRef: string;
+      columns: [string, string, string];
+      rows: CaseStudyComparativeRow[];
+    };
+    cta: {
+      title: string;
+      description: string;
+      primaryButtonText: string;
+      secondaryButtonText?: string;
+      targetServiceId?: string;
+      targetPage?: PageView;
+    };
+  };
+}
+
