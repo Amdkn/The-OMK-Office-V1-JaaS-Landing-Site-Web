@@ -31,7 +31,7 @@ export default function App() {
     setIsModalOpen(true)
   }
 
-  // Auto-close sidebar on mobile
+  // Auto-close sidebar on mobile & reset scroll on page change
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024
@@ -48,11 +48,31 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Reset scroll and lock window scroll
+  useEffect(() => {
+    const scrollContainer = document.getElementById('main-scroll-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
+  }, [currentPage])
+
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      if (window.scrollY !== 0 || window.scrollX !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', handleWindowScroll);
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, [])
+
   // Definition of anchors based on the active view
   const getNavAnchors = () => {
     switch (currentPage) {
       case 'home':
         return [
+          { label: 'Accueil', id: 'hero-global' },
           { label: t.header.nav.catalogue[lang], id: 'catalogue' },
           { label: t.header.nav.offers[lang], id: 'grille-offres' },
           { label: t.header.nav.pricing[lang], id: 'tarifs-actes' },
@@ -76,9 +96,11 @@ export default function App() {
         ];
       case 'jaas':
         return [
+          { label: 'Vue Globale ($300/an)', id: 'jaas-hero' },
+          { label: 'Pôle 1 · Légal (25 Actes)', id: 'jaas-pole1' },
+          { label: 'Pôle 2 · Finance (25 Actes)', id: 'jaas-pole2' },
+          { label: 'Pôle 3 · Carrière (25 Actes)', id: 'jaas-pole3' },
           { label: 'Simulateur 1-Click', id: 'jaas-simulateur-1click' },
-          { label: t.header.nav.jaas_method[lang], id: 'jaas-methode' },
-          { label: '25 Actes Pôle 3', id: 'jaas-pricing' },
           { label: 'Amortissement $50', id: 'jaas-simulateur-roi' },
         ];
       case 'matrix':
@@ -170,10 +192,10 @@ export default function App() {
       </div>
 
       {/* Main Content Area - Large Nested Clay/Glass Container */}
-      <div className="flex-1 flex flex-col theme-main-content relative z-0 transition-all duration-500 w-full max-w-full">
+      <div className="flex-1 flex flex-col theme-main-content relative z-0 transition-all duration-500 w-full max-w-full overflow-hidden">
         
         {/* Scrollable Container */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth flex flex-col items-center">
+        <div id="main-scroll-container" className="main-scroll-container flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth flex flex-col items-center w-full">
           
           {/* Sticky Floating Header */}
           <div className="sticky top-0 z-40 w-full max-w-7xl mx-auto px-4 lg:px-6 pt-4 lg:pt-5 pointer-events-none">

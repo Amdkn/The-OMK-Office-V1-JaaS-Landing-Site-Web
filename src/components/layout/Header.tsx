@@ -1,3 +1,4 @@
+import React from "react"
 import { Button } from "@/src/components/ui/button"
 import { PageView } from "../../types"
 import { Menu, Globe, Palette } from "lucide-react"
@@ -19,6 +20,7 @@ export function Header({ currentPage, onOpenModal, isSidebarOpen, toggleSidebar,
 
   const NAV_LINKS: Record<PageView, { label: string; href: string }[]> = {
     'home': [
+      { label: 'Accueil', href: '#hero-global' },
       { label: t.header.nav.catalogue[lang], href: '#catalogue' },
       { label: t.header.nav.offers[lang], href: '#grille-offres' },
       { label: t.header.nav.pricing[lang], href: '#tarifs-actes' },
@@ -38,20 +40,23 @@ export function Header({ currentPage, onOpenModal, isSidebarOpen, toggleSidebar,
       { label: 'Amortissement $50', href: '#pole3-roi' },
     ],
     'jaas': [
-      { label: t.header.nav.jaas_method[lang], href: '#jaas-methode' },
-      { label: t.header.nav.jaas_pricing[lang], href: '#jaas-pricing' },
-      { label: t.header.nav.jaas_roi[lang], href: '#jaas-simulateur-roi' },
+      { label: 'Vue Globale ($300/an)', href: '#jaas-hero' },
+      { label: 'Pôle 1 · Légal (25 Actes)', href: '#jaas-pole1' },
+      { label: 'Pôle 2 · Finance (25 Actes)', href: '#jaas-pole2' },
+      { label: 'Pôle 3 · Carrière (25 Actes)', href: '#jaas-pole3' },
+      { label: 'Simulateur 1-Click', href: '#jaas-simulateur-1click' },
+      { label: 'Affiliation $50', href: '#jaas-simulateur-roi' },
     ],
     'matrix': [
-      { label: 'Matrice Complète', href: '#matrix-explorer' },
-      { label: 'Pôle 1 (Légal)', href: '#matrix-explorer' },
-      { label: 'Pôle 2 (Finance)', href: '#matrix-explorer' },
-      { label: 'Pôle 3 (JaaS)', href: '#matrix-explorer' },
+      { label: 'Architecture 3x5x5', href: '#matrix-explorer' },
     ],
     'baas': [
-      { label: t.header.nav.baas_pillars[lang], href: '#baas-piliers' },
-      { label: t.header.nav.baas_pricing[lang], href: '#baas-pricing' },
-      { label: t.header.nav.baas_rule[lang], href: '#baas-regle-des-5' },
+      { label: 'Vue d’ensemble', href: '#baas-hero' },
+      { label: '1. Légal & Création', href: '#baas-launchpad' },
+      { label: '2. Fiscalité', href: '#baas-finance' },
+      { label: '3. Acquisition', href: '#baas-growth' },
+      { label: '4. Back-Office OS', href: '#baas-runtime' },
+      { label: '5. Règle des 5', href: '#baas-regle-5' },
     ],
     'paas': [
       { label: t.header.nav.paas_horizons[lang], href: '#paas-horizons' },
@@ -72,6 +77,33 @@ export function Header({ currentPage, onOpenModal, isSidebarOpen, toggleSidebar,
   };
 
   const links = NAV_LINKS[currentPage] || []
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const id = href.replace('#', '');
+    const scrollContainer = document.getElementById('main-scroll-container');
+    
+    if (id === 'hero-global' || id === 'accueil' || id === 'top' || id === 'baas-hero') {
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    const element = document.getElementById(id);
+    if (element && scrollContainer) {
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+      const elementTop = element.getBoundingClientRect().top;
+      const offsetPosition = elementTop - containerTop + scrollContainer.scrollTop - 90;
+
+      scrollContainer.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth'
+      });
+    } else if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <header 
@@ -105,7 +137,8 @@ export function Header({ currentPage, onOpenModal, isSidebarOpen, toggleSidebar,
             <a 
               key={idx} 
               href={link.href} 
-              className="text-sm font-bold text-slate-600 hover:text-blue-600 hover:bg-white px-4 py-2 rounded-full transition-all"
+              onClick={(e) => handleNavClick(e, link.href)}
+              className="text-sm font-bold text-slate-600 hover:text-blue-600 hover:bg-white px-4 py-2 rounded-full transition-all cursor-pointer"
             >
               {link.label}
             </a>

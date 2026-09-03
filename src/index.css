@@ -61,7 +61,7 @@
 :root {
   --app-bg: #F0F2F5;
   --main-bg: #FFFFFF;
-  --main-radius: 3rem;
+  --main-radius: 2.5rem;
   --main-border: 1px solid white;
   --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
   --font-family: "Plus Jakarta Sans", sans-serif;
@@ -70,7 +70,7 @@
 [data-theme="glassmorphism"] {
   --app-bg: #F0F2F5;
   --main-bg: #FFFFFF;
-  --main-radius: 3rem;
+  --main-radius: 2.5rem;
   --main-border: 1px solid white;
   --main-shadow: 0 8px 40px rgba(0,0,0,0.04);
   --font-family: "Plus Jakarta Sans", sans-serif;
@@ -79,9 +79,9 @@
 [data-theme="warm-paper"] {
   --app-bg: #EAE0D5;
   --main-bg: #FDFBF7;
-  --main-radius: 1.5rem;
-  --main-border: 1px solid #E5D3B3;
-  --main-shadow: 0 4px 20px rgba(139, 115, 85, 0.1);
+  --main-radius: 2.5rem;
+  --main-border: 1.5px solid #E2D1B8;
+  --main-shadow: 0 12px 40px rgba(139, 115, 85, 0.15);
   --font-family: Georgia, serif;
 }
 
@@ -95,19 +95,19 @@
 }
 
 [data-theme="dark-oled"] {
-  --app-bg: #FFFFFF; /* It will be inverted to black */
-  --main-bg: #FDFDFD; /* Inverted to #020202 */
-  --main-radius: 1rem;
-  --main-border: 1px solid #EEE;
-  --main-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+  --app-bg: #0B0F19;
+  --main-bg: #030712;
+  --main-radius: 2.5rem;
+  --main-border: 1px solid #1E293B;
+  --main-shadow: 0 0 35px rgba(16, 185, 129, 0.15);
   --font-family: "SF Mono", Consolas, monospace;
 }
 
 [data-theme="claymorphism"] {
   --app-bg: #E0E5EC;
   --main-bg: #E0E5EC;
-  --main-radius: 4rem;
-  --main-border: 2px solid rgba(255,255,255,0.5);
+  --main-radius: 3rem;
+  --main-border: 2px solid rgba(255,255,255,0.6);
   --main-shadow: 15px 15px 30px rgba(163,177,198,0.5), -15px -15px 30px rgba(255,255,255,0.8);
   --font-family: "Plus Jakarta Sans", sans-serif;
 }
@@ -121,6 +121,8 @@
   border-radius: var(--main-radius) !important;
   border: var(--main-border) !important;
   box-shadow: var(--main-shadow) !important;
+  overflow: hidden !important;
+  contain: paint;
 }
 
 .theme-font {

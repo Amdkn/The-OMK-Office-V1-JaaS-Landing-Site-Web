@@ -17,6 +17,22 @@ export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: () => v
   
   const { lang } = useLanguage()
 
+  const scrollToSection = (id: string) => {
+    const scrollContainer = document.getElementById('main-scroll-container');
+    const element = document.getElementById(id);
+    if (element && scrollContainer) {
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+      const elementTop = element.getBoundingClientRect().top;
+      const offsetPosition = elementTop - containerTop + scrollContainer.scrollTop - 90;
+      scrollContainer.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth'
+      });
+    } else if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   return (
     <div className="flex flex-col w-full bg-slate-50 relative overflow-hidden">
       
@@ -26,7 +42,7 @@ export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: () => v
       <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-amber-400/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000 pointer-events-none z-0"></div>
 
       {/* HERO GLOBAL - Glassmorphism */}
-      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 z-10">
+      <section id="hero-global" className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 z-10 scroll-mt-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-5xl mx-auto glass rounded-[3rem] p-10 md:p-16 lg:p-20 relative overflow-hidden">
             {/* Inner subtle gradient for extra depth */}
@@ -48,10 +64,10 @@ export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: () => v
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-                <Button size="lg" onClick={() => document.getElementById('catalogue')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white shadow-xl shadow-slate-900/20 text-lg h-16 px-6 sm:px-10 rounded-full transition-all hover:scale-105 active:scale-95">
+                <Button size="lg" onClick={() => scrollToSection('catalogue')} className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white shadow-xl shadow-slate-900/20 text-lg h-16 px-6 sm:px-10 rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer">
                   {t.home.btn_explore[lang]}
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => document.getElementById('grille-offres')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto gap-2 border-slate-300 text-slate-800 bg-white/60 backdrop-blur hover:bg-white text-lg h-16 px-6 sm:px-10 rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm">
+                <Button size="lg" variant="outline" onClick={() => scrollToSection('grille-offres')} className="w-full sm:w-auto gap-2 border-slate-300 text-slate-800 bg-white/60 backdrop-blur hover:bg-white text-lg h-16 px-6 sm:px-10 rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm cursor-pointer">
                   {t.home.btn_discover[lang]}
                 </Button>
               </div>
@@ -90,12 +106,12 @@ export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: () => v
       </section>
 
       {/* CATALOGUE */}
-      <div id="catalogue" className="relative z-10 bg-slate-50 pt-16">
+      <div id="catalogue" className="relative z-10 bg-slate-50 pt-16 scroll-mt-28">
         <ServicesCatalog onOpenBooking={() => onOpenModal()} />
       </div>
 
       {/* GRILLE DES OFFRES - Glassmorphism Dark Mode (OLED) */}
-      <section id="grille-offres" className="py-32 bg-slate-950 text-white relative z-10 overflow-hidden">
+      <section id="grille-offres" className="py-32 bg-slate-950 text-white relative z-10 overflow-hidden scroll-mt-28">
         <ShapeDivider position="top" type="waves-opacity" color="fill-slate-50" />
         {/* Dark Mode glowing orbs */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50"></div>

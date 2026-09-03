@@ -10,18 +10,25 @@ export const AnchorNav: React.FC<AnchorNavProps> = ({ sections }) => {
   const { theme } = useTheme();
 
   useEffect(() => {
-    const scrollContainer = document.querySelector('.flex-1.overflow-y-auto') || window;
+    const scrollContainer = document.getElementById('main-scroll-container') || document.querySelector('.main-scroll-container') || window;
     
     const handleScroll = (e: Event) => {
       const target = e.target as HTMLElement | Window;
       const scrollY = target === window ? window.scrollY : (target as HTMLElement).scrollTop;
-      const scrollPosition = scrollY + window.innerHeight / 3;
+      const scrollPosition = scrollY + 150;
       
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = document.getElementById(sections[i].id);
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(sections[i].id);
-          break;
+        if (section) {
+          const container = document.getElementById('main-scroll-container');
+          const elementOffset = container 
+            ? section.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop
+            : section.offsetTop;
+            
+          if (elementOffset <= scrollPosition) {
+            setActiveSection(sections[i].id);
+            break;
+          }
         }
       }
     };
@@ -36,8 +43,25 @@ export const AnchorNav: React.FC<AnchorNavProps> = ({ sections }) => {
   }, [sections]);
 
   const scrollToSection = (id: string) => {
+    const scrollContainer = document.getElementById('main-scroll-container');
+    if (id === 'hero-global' || id === 'accueil' || id === 'top' || id === 'baas-hero') {
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
     const element = document.getElementById(id);
-    if (element) {
+    if (element && scrollContainer) {
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+      const elementTop = element.getBoundingClientRect().top;
+      const offsetPosition = elementTop - containerTop + scrollContainer.scrollTop - 90;
+
+      scrollContainer.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth'
+      });
+    } else if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };

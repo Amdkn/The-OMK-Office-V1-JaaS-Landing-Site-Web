@@ -33,17 +33,17 @@ const MENU_SECTIONS: MenuSection[] = [
     ]
   },
   {
-    title: "LES 3 PÔLES OPÉRATIONNELS",
+    title: "LES 3 PÔLES OPÉRATIONNELS (75 ACTES)",
     items: [
       { id: 'pole-1-legal', label: 'Pôle 1 · Légal & Admin', icon: ShieldCheck, desc: '25 Actes · USCIS & Notariat', color: 'blue' },
       { id: 'pole-2-finance', label: 'Pôle 2 · Finance & Fisc', icon: Calculator, desc: '25 Actes · 1040, ITIN & LLC', color: 'emerald' },
-      { id: 'pole-3-career', label: 'Pôle 3 · Carrière & JaaS', icon: GraduationCap, desc: '25 Actes · Skills & Dispatch', color: 'amber' },
+      { id: 'pole-3-career', label: 'Pôle 3 · Carrière & Éduc', icon: GraduationCap, desc: '25 Actes · Skills & Dispatch', color: 'amber' },
     ]
   },
   {
     title: "OFFRES & PACKAGES",
     items: [
-      { id: 'jaas', label: 'JOB (JaaS - $300/an)', icon: Briefcase, desc: 'Accélérateur de Carrière V1', color: 'amber' },
+      { id: 'jaas', label: 'JOB (JaaS - $300/an)', icon: Briefcase, desc: 'Passeport 3 Pôles · 75 Actes', color: 'amber' },
       { id: 'baas', label: 'BUZZ (BaaS - $720)', icon: Zap, desc: 'Business Launchpad Solarpunk', color: 'indigo' },
       { id: 'paas', label: 'PRO (PaaS - $1,500)', icon: Sprout, desc: 'BaaS Factory & Hubs', color: 'emerald' },
     ]
