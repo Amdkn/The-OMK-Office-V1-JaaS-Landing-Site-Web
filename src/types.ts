@@ -1,5 +1,6 @@
 export type PageView = 
   | 'home' 
+  | 'dashboard'
   | 'pole-1-legal' 
   | 'pole-2-finance' 
   | 'pole-3-career' 
@@ -91,6 +92,23 @@ export interface CaseStudyInspectorTab {
   rawJson?: Record<string, any>;
 }
 
+export interface CaseStudySqlSnippet {
+  title: string;
+  description?: string;
+  code: string;
+}
+
+export interface CaseStudySqlSection {
+  title: string;
+  subtitle: string;
+  entitiesTable: {
+    table: string;
+    role: string;
+    partitionKey: string;
+  }[];
+  snippets: CaseStudySqlSnippet[];
+}
+
 export interface CaseStudy {
   id: string;
   pole: CaseStudyPole;
@@ -113,6 +131,7 @@ export interface CaseStudy {
     value: string;
     label: string;
   };
+  sqlArchitecture?: CaseStudySqlSection;
   problem: {
     title: string;
     summary: string;

@@ -4,7 +4,7 @@ import { Button } from "@/src/components/ui/button"
 import { 
   ArrowLeft, Clock, ShieldCheck, Scale, Zap, Calculator, CheckCircle2, 
   AlertTriangle, Layers, FileText, ChevronRight, Hash, ArrowRight, 
-  Check, ExternalLink, Download, FileCheck, Stamp
+  Check, ExternalLink, Download, FileCheck, Stamp, Database, Copy, Terminal
 } from "lucide-react"
 
 interface CaseStudyDetailProps {
@@ -27,9 +27,17 @@ export function CaseStudyDetail({
   // Tab state for interactive inspector
   const defaultTabId = study.resolution.interactiveInspector?.tabs[0]?.id || "tab-0"
   const [activeTabId, setActiveTabId] = useState<string>(defaultTabId)
+  const [activeSqlIndex, setActiveSqlIndex] = useState<number>(0)
+  const [copiedCode, setCopiedCode] = useState<boolean>(false)
 
   const activeTab = study.resolution.interactiveInspector?.tabs.find(t => t.id === activeTabId) 
     || study.resolution.interactiveInspector?.tabs[0]
+
+  const handleCopySql = (code: string) => {
+    navigator.clipboard.writeText(code)
+    setCopiedCode(true)
+    setTimeout(() => setCopiedCode(false), 2000)
+  }
 
   // Find next and prev study
   const currentIndex = allStudies.findIndex(s => s.id === study.id)
@@ -373,6 +381,127 @@ export function CaseStudyDetail({
                     </pre>
                   </details>
                 )}
+              </div>
+            )}
+
+            {/* SQL & Sovereign Architecture Inspector (if present) */}
+            {study.sqlArchitecture && (
+              <div className="mt-8 rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-xl text-slate-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-5 mb-6">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 font-mono text-[11px] font-bold uppercase mb-2 border border-blue-500/20">
+                      <Database className="w-3.5 h-3.5" />
+                      PostgreSQL · Supabase RLS Engine
+                    </div>
+                    <h3 className="text-xl font-black text-white">
+                      {study.sqlArchitecture.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {study.sqlArchitecture.subtitle}
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold shrink-0 self-start sm:self-center">
+                    SECURITY DEFINER · CACHED
+                  </span>
+                </div>
+
+                {/* Entities Architecture Table */}
+                <div className="mb-6 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/60">
+                  <div className="p-3 bg-slate-800/40 border-b border-slate-800 text-xs font-mono font-bold text-slate-300 flex items-center justify-between">
+                    <span>Architecture des Entités & Cloisonnement</span>
+                    <span className="text-[10px] text-slate-400 font-normal">Partitionnement Strict tenant_id</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs font-mono">
+                      <thead>
+                        <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 text-[11px]">
+                          <th className="p-3 font-semibold">Table</th>
+                          <th className="p-3 font-semibold">Rôle Principal</th>
+                          <th className="p-3 font-semibold text-emerald-400">Clé de Cloisonnement</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60">
+                        {study.sqlArchitecture.entitiesTable.map((ent, idx) => (
+                          <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                            <td className="p-3 font-bold text-blue-300 flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                              public.{ent.table}
+                            </td>
+                            <td className="p-3 text-slate-300 font-sans text-xs">{ent.role}</td>
+                            <td className="p-3 text-emerald-300 font-semibold">{ent.partitionKey}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* SQL Snippets Selector */}
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    {study.sqlArchitecture.snippets.map((snip, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveSqlIndex(idx)}
+                        className={`text-xs px-3 py-2 rounded-lg font-mono font-medium transition-all flex items-center gap-2 ${
+                          activeSqlIndex === idx
+                            ? "bg-blue-600 text-white shadow-md shadow-blue-500/20 font-bold"
+                            : "bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-700/50"
+                        }`}
+                      >
+                        <Terminal className="w-3.5 h-3.5" />
+                        {snip.title}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Active SQL Snippet Window */}
+                  {study.sqlArchitecture.snippets[activeSqlIndex] && (
+                    <div className="rounded-xl bg-slate-950 border border-slate-800 overflow-hidden shadow-2xl">
+                      <div className="p-3 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <div className="text-xs font-bold text-slate-200 font-mono">
+                            {study.sqlArchitecture.snippets[activeSqlIndex].title}
+                          </div>
+                          {study.sqlArchitecture.snippets[activeSqlIndex].description && (
+                            <p className="text-[11px] text-slate-400 font-sans mt-0.5">
+                              {study.sqlArchitecture.snippets[activeSqlIndex].description}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleCopySql(study.sqlArchitecture!.snippets[activeSqlIndex].code)}
+                          className="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-slate-200 transition-colors border border-white/10"
+                        >
+                          {copiedCode ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span className="text-emerald-400 font-bold">Copié !</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copier SQL</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="relative">
+                        <pre className="p-5 font-mono text-xs leading-relaxed text-slate-200 overflow-x-auto max-h-[420px] bg-black/70">
+                          <code>{study.sqlArchitecture.snippets[activeSqlIndex].code}</code>
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-5 p-3 rounded-lg bg-blue-950/40 border border-blue-900/60 text-xs text-blue-200 flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold font-mono">Garantie Déterministe :</span> Les fonctions <code className="text-blue-300 font-mono">is_tenant_member</code> et <code className="text-blue-300 font-mono">get_tenant_role</code> avec <code className="text-blue-300 font-mono">set search_path = public</code> et <code className="text-blue-300 font-mono">security definer</code> empêchent les attaques par injection de schéma et permettent l'évaluation native en mémoire vive sans impact CPU.
+                  </div>
+                </div>
               </div>
             )}
           </div>

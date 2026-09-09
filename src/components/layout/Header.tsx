@@ -1,89 +1,78 @@
 import React from "react"
-import { Button } from "@/src/components/ui/button"
 import { PageView } from "../../types"
-import { Menu, Globe, Palette } from "lucide-react"
+import { Menu, Globe, Lock } from "lucide-react"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { t } from "../../i18n/translations"
-import { useTheme } from "../../contexts/ThemeContext"
+import { useUser } from "../../contexts/UserContext"
+import { UserProfileButton } from "../profile/UserProfileButton"
+import { ThemeSelector } from "./ThemeSelector"
 
 interface HeaderProps {
   currentPage: PageView;
+  setCurrentPage?: (page: PageView) => void;
   onOpenModal: () => void;
   isSidebarOpen: boolean;
   toggleSidebar?: () => void;
   isMobile?: boolean;
 }
 
-export function Header({ currentPage, onOpenModal, isSidebarOpen, toggleSidebar, isMobile }: HeaderProps) {
+interface NavSectionLink {
+  label: string;
+  href: string;
+  badge?: string;
+  badgeColor?: string;
+}
+
+export function Header({ currentPage, setCurrentPage, onOpenModal, isSidebarOpen, toggleSidebar, isMobile }: HeaderProps) {
   const { lang, toggleLang } = useLanguage();
-  const { theme, setTheme } = useTheme();
+  const { openProfile } = useUser();
 
-  const NAV_LINKS: Record<PageView, { label: string; href: string }[]> = {
-    'home': [
-      { label: 'Accueil', href: '#hero-global' },
-      { label: t.header.nav.catalogue[lang], href: '#catalogue' },
-      { label: t.header.nav.offers[lang], href: '#grille-offres' },
-      { label: t.header.nav.pricing[lang], href: '#tarifs-actes' },
-      { label: t.header.nav.simulator[lang], href: '#simulateur-base' },
-    ],
-    'pole-1-legal': [
-      { label: 'Diagnostic EAD & Urgences', href: '#pole1-checker' },
-      { label: 'Catalogue 25 Actes', href: '#pole1-catalog' },
-    ],
-    'pole-2-finance': [
-      { label: 'Simulateur 1040 & ITIN', href: '#pole2-simulator' },
-      { label: 'Catalogue 25 Actes', href: '#pole2-catalog' },
-    ],
-    'pole-3-career': [
-      { label: 'Simulateur 1-Click', href: '#pole3-simulator' },
-      { label: '25 Actes Carrière', href: '#pole3-acts-breakdown' },
-      { label: 'Amortissement $50', href: '#pole3-roi' },
-    ],
-    'jaas': [
-      { label: 'Vue Globale ($300/an)', href: '#jaas-hero' },
-      { label: 'Pôle 1 · Légal (25 Actes)', href: '#jaas-pole1' },
-      { label: 'Pôle 2 · Finance (25 Actes)', href: '#jaas-pole2' },
-      { label: 'Pôle 3 · Carrière (25 Actes)', href: '#jaas-pole3' },
-      { label: 'Simulateur 1-Click', href: '#jaas-simulateur-1click' },
-      { label: 'Affiliation $50', href: '#jaas-simulateur-roi' },
-    ],
-    'matrix': [
-      { label: 'Architecture 3x5x5', href: '#matrix-explorer' },
-    ],
-    'baas': [
-      { label: 'Vue d’ensemble', href: '#baas-hero' },
-      { label: '1. Légal & Création', href: '#baas-launchpad' },
-      { label: '2. Fiscalité', href: '#baas-finance' },
-      { label: '3. Acquisition', href: '#baas-growth' },
-      { label: '4. Back-Office OS', href: '#baas-runtime' },
-      { label: '5. Règle des 5', href: '#baas-regle-5' },
-    ],
-    'paas': [
-      { label: t.header.nav.paas_horizons[lang], href: '#paas-horizons' },
-      { label: t.header.nav.paas_solarpunk[lang], href: '#paas-solarpunk' },
-      { label: t.header.nav.paas_factory[lang], href: '#paas-factory' },
-    ],
-    'blog-poc': [
-      { label: t.header.nav.poc_problem[lang], href: '#poc-probleme' },
-      { label: t.header.nav.poc_resolution[lang], href: '#poc-resolution' },
-      { label: t.header.nav.poc_results[lang], href: '#poc-resultats' },
-    ],
-    'mobile-os': [
-      { label: 'Aperçu Mobile', href: '#mobile-preview' },
-      { label: 'Login FaceID', href: '#mobile-auth' },
-      { label: 'Apps & Widgets', href: '#mobile-apps' },
-      { label: 'Spécifications', href: '#mobile-specs' },
-    ],
-  };
+  // Sections de la Page d'Accueil
+  const HOME_SECTIONS: NavSectionLink[] = [
+    { label: 'Accueil', href: '#hero-global' },
+    { label: t.header.nav.catalogue[lang] + ' (75 Actes)', href: '#catalogue' },
+    { label: t.header.nav.offers[lang], href: '#grille-offres' },
+    { 
+      label: t.header.nav.simulator[lang] + ' $0 Net', 
+      href: '#simulateur-base',
+      badge: '$0 Net',
+      badgeColor: 'bg-emerald-100 text-emerald-800'
+    },
+    { label: t.header.nav.pricing[lang], href: '#tarifs-actes' },
+  ];
 
-  const links = NAV_LINKS[currentPage] || []
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, link: NavSectionLink) => {
     e.preventDefault();
-    const id = href.replace('#', '');
-    const scrollContainer = document.getElementById('main-scroll-container');
+    const id = link.href.replace('#', '');
     
-    if (id === 'hero-global' || id === 'accueil' || id === 'top' || id === 'baas-hero') {
+    // Si l'utilisateur n'est pas sur la page d'accueil, basculer d'abord sur la page d'accueil
+    if (currentPage !== 'home' && setCurrentPage) {
+      setCurrentPage('home');
+      setTimeout(() => {
+        const scrollContainer = document.getElementById('main-scroll-container');
+        if (id === 'hero-global' || id === 'top' || !id) {
+          if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        const element = document.getElementById(id);
+        if (element && scrollContainer) {
+          const containerTop = scrollContainer.getBoundingClientRect().top;
+          const elementTop = element.getBoundingClientRect().top;
+          const offsetPosition = elementTop - containerTop + scrollContainer.scrollTop - 90;
+          scrollContainer.scrollTo({
+            top: Math.max(0, offsetPosition),
+            behavior: 'smooth'
+          });
+        } else if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 120);
+      return;
+    }
+
+    // Déjà sur la page d'accueil: défilement fluide vers la section
+    const scrollContainer = document.getElementById('main-scroll-container');
+    if (id === 'hero-global' || id === 'top' || !id) {
       if (scrollContainer) {
         scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -107,75 +96,92 @@ export function Header({ currentPage, onOpenModal, isSidebarOpen, toggleSidebar,
 
   return (
     <header 
-      className={`w-full backdrop-blur-xl bg-white/80 border border-slate-200/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full transition-all duration-300`}
+      className={`w-full backdrop-blur-xl bg-white/90 border border-slate-200/70 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full transition-all duration-300`}
     >
-      <div className="flex items-center justify-between px-3 py-3 sm:px-4 lg:px-6 h-[72px]">
+      <div className="flex items-center justify-between px-3 py-2 sm:px-5 lg:px-6 h-[68px]">
         
-        <div className="flex items-center gap-3">
+        {/* LEFT: Menu Toggle + Brand Logo / Hub Status */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           {(!isSidebarOpen || isMobile) && (
             <button 
               onClick={toggleSidebar}
-              className="p-2.5 bg-white rounded-full text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"
+              className="p-2 bg-white rounded-full text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors shrink-0"
+              title="Ouvrir le menu latéral"
             >
               <Menu className="w-5 h-5" />
             </button>
           )}
           
-          <div className="hidden md:flex items-center gap-2 rounded-full border border-emerald-200/60 bg-emerald-50/80 px-4 py-1.5 shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          <button 
+            onClick={() => {
+              if (currentPage !== 'home' && setCurrentPage) {
+                setCurrentPage('home');
+              }
+              const scrollContainer = document.getElementById('main-scroll-container');
+              if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2 group cursor-pointer text-left shrink-0"
+            title="Accueil The OMK Office"
+          >
+            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight flex items-center gap-1.5">
+              <span>The OMK Office</span>
             </span>
-            <span className="text-[10px] font-bold text-emerald-700 tracking-widest uppercase">
-              {currentPage === 'home' ? t.header.active_office[lang] : `${t.header.mode[lang]} ${currentPage.toUpperCase()}`}
-            </span>
-          </div>
+          </button>
         </div>
 
-        <nav className="hidden lg:flex items-center bg-slate-50/80 rounded-full px-2 py-1.5 border border-slate-200/50">
-          {links.map((link, idx) => (
+        {/* CENTER: SECTIONS DE LA PAGE D'ACCUEIL */}
+        <nav className="hidden lg:flex items-center bg-slate-100/80 rounded-full px-2 py-1 border border-slate-200/80 shadow-inner gap-0.5">
+          {HOME_SECTIONS.map((link, idx) => (
             <a 
               key={idx} 
               href={link.href} 
-              onClick={(e) => handleNavClick(e, link.href)}
-              className="text-sm font-bold text-slate-600 hover:text-blue-600 hover:bg-white px-4 py-2 rounded-full transition-all cursor-pointer"
+              onClick={(e) => handleNavClick(e, link)}
+              className="text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white px-3.5 py-1.5 rounded-full transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap shadow-none hover:shadow-xs"
             >
-              {link.label}
+              <span>{link.label}</span>
+              {link.badge && (
+                <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full uppercase ${link.badgeColor || 'bg-slate-200 text-slate-700'}`}>
+                  {link.badge}
+                </span>
+              )}
             </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Dropdown de Thèmes */}
-          <div className="relative group">
-            <button className="flex items-center justify-center space-x-1 w-auto px-3 sm:px-4 h-10 sm:h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200">
-              <Palette className="w-4 h-4 text-amber-500" />
-              <span className="hidden sm:inline text-xs font-bold capitalize">{theme.replace('-', ' ')}</span>
-            </button>
-            
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 hidden group-hover:block z-50">
-              <div className="text-[10px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider">Themes</div>
-              <button onClick={() => setTheme('warm-paper')} className={`w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-100 ${theme === 'warm-paper' ? 'font-bold bg-slate-50' : ''}`}>Warm Paper</button>
-              <button onClick={() => setTheme('glassmorphism')} className={`w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-100 ${theme === 'glassmorphism' ? 'font-bold bg-slate-50' : ''}`}>Glassmorphism</button>
-              <button onClick={() => setTheme('brutalism')} className={`w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-100 ${theme === 'brutalism' ? 'font-bold bg-slate-50' : ''}`}>Brutalism</button>
-              <button onClick={() => setTheme('dark-oled')} className={`w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-100 ${theme === 'dark-oled' ? 'font-bold bg-slate-50' : ''}`}>Dark OLED</button>
-              <button onClick={() => setTheme('claymorphism')} className={`w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-100 ${theme === 'claymorphism' ? 'font-bold bg-slate-50' : ''}`}>Claymorphism</button>
-            </div>
-          </div>
+        {/* RIGHT CONTROLS: Themes, Language, Back-Office OS, User Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Sélecteur de Thèmes Compact */}
+          <ThemeSelector />
 
+          {/* Langue FR/EN */}
           <button 
             onClick={toggleLang}
-            className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-            title="Toggle Language"
+            className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer border border-slate-200/60"
+            title="Changer de langue"
           >
-            <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="ml-1 text-xs font-bold uppercase">{lang}</span>
+            <Globe className="w-3.5 h-3.5" />
+            <span className="ml-1 text-[10.5px] font-bold uppercase">{lang}</span>
           </button>
           
-          <Button onClick={onOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white shadow-md font-bold rounded-full px-4 sm:px-6 h-10 sm:h-11 text-xs sm:text-sm">
-            <span className="hidden sm:inline">{t.header.book_appointment[lang]}</span>
-            <span className="sm:hidden">{t.header.book_short[lang]}</span>
-          </Button>
+          {/* Back-Office OS Bouton d'accès Réduit */}
+          <button
+            onClick={() => setCurrentPage?.(currentPage === 'dashboard' ? 'home' : 'dashboard')}
+            className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all border shadow-xs cursor-pointer shrink-0 ${
+              currentPage === 'dashboard'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-blue-500/20'
+                : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border-amber-500/30'
+            }`}
+            title="Accès au Back-Office OS"
+          >
+            <Lock className="w-3 h-3 text-amber-400" />
+            <span>{currentPage === 'dashboard' ? 'Public' : 'Back-Office'}</span>
+          </button>
+
+          {/* User Profile */}
+          <UserProfileButton 
+            onOpenBookingModal={onOpenModal} 
+            onNavigateToDashboard={() => setCurrentPage?.('dashboard')}
+          />
         </div>
       </div>
     </header>
