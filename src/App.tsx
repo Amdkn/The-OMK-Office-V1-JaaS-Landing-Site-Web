@@ -17,6 +17,7 @@ import { VisitorHubView } from "./components/dashboard/VisitorHubView";
 import { ClientHubView } from "./components/dashboard/ClientHubView";
 import { StaffOpsView } from "./components/dashboard/StaffOpsView";
 import { BookingModal } from "./components/shared/BookingModal";
+import { AuthAccessModal } from "./components/auth/AuthAccessModal";
 import { UserProfileModal } from "./components/profile/UserProfileModal";
 import { PageView } from "./types";
 import { useLanguage } from "./contexts/LanguageContext";
@@ -545,23 +546,25 @@ export function DashboardLayout({
       <AnchorNav sections={getNavAnchors()} />
 
       {/* Role-Conditioned Sidebar Wrapper */}
-      <div 
-        className={`
-          fixed inset-y-4 left-4 z-50 shrink-0
-          lg:static lg:inset-auto lg:h-full lg:translate-x-0
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-[150%] lg:hidden'}
-        `}
-      >
-        <Sidebar 
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-          isMobile={isMobile}
-          menuSections={menuSections}
-          activeRole={activePersona}
-        />
-      </div>
+      {currentPage === 'dashboard' && (
+            <div
+              className={`
+                fixed inset-y-4 left-4 z-50 shrink-0
+                lg:static lg:inset-auto lg:h-full lg:translate-x-0
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-[150%] lg:hidden'}
+              `}
+            >
+              <Sidebar
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                isOpen={isSidebarOpen}
+                setIsOpen={setIsSidebarOpen}
+                isMobile={isMobile}
+                menuSections={menuSections}
+                activeRole={activePersona}
+              />
+            </div>
+      )}
 
       {/* Main Content Area - Large Nested Clay/Glass Container */}
       <div className="flex-1 flex flex-col theme-main-content relative z-0 transition-all duration-500 w-full max-w-full overflow-hidden">
@@ -626,7 +629,7 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | undefined>(undefined);
 
-  const { activeRole, currentRole } = useUser();
+  const { activeRole, currentRole, isAuthModalOpen, closeAuthModal, authModalDefaultTab } = useUser();
 
   const handleOpenModal = (serviceId?: string) => {
     setSelectedServiceId(serviceId);
@@ -679,6 +682,12 @@ export default function App() {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         isMobile={isMobile}
+      />
+
+      <AuthAccessModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        defaultTab={authModalDefaultTab}
       />
 
       <BookingModal 
