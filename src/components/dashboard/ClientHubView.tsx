@@ -309,6 +309,34 @@ export function ClientHubView() {
               </div>
             </div>
 
+
+            {/* Progression & Milestones Header */}
+            <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col space-y-3">
+              <div className="flex justify-between items-center text-sm font-bold text-white">
+                <span>Progression du Dossier</span>
+                <span className="text-emerald-400">40%</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-2.5">
+                <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: '40%' }}></div>
+              </div>
+              <div className="grid grid-cols-5 text-center text-[10px] font-mono text-slate-400 mt-2">
+                <div className="text-emerald-400 font-bold">Intake</div>
+                <div className="text-emerald-400 font-bold">Traduction</div>
+                <div className="text-white font-bold">USCIS</div>
+                <div>Biométrie</div>
+                <div>Décision</div>
+              </div>
+            </div>
+
+            {/* Dépôt simplifié des pièces d'identité */}
+            <div className="bg-slate-900/80 border border-slate-700 border-dashed rounded-2xl p-6 mb-8 text-center hover:bg-slate-800/80 transition-colors cursor-pointer group">
+              <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-500/20 transition-colors">
+                <Plus className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h3 className="text-white font-bold text-sm mb-1">Dépôt simplifié de pièces d'identité / procurations</h3>
+              <p className="text-xs text-slate-400">Glissez-déposez vos fichiers ici (PDF, JPG, PNG)</p>
+            </div>
+
             {/* Step-by-Step Uber Timeline */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
               {UBER_TRACKER_STEPS.map((step, idx) => {

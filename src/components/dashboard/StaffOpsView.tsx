@@ -128,18 +128,19 @@ const IMMIGRATION_CASES: ImmigrationCase[] = [
 
 export function StaffOpsView() {
   const { currentUser, activeDashboardTab, setActiveDashboardTab } = useUser();
-  const [activeTab, setActiveTab] = useState<'inbox' | 'cases' | 'notary_bench' | 'metrics' | 'fast_actions'>('inbox');
+  const [activeTab, setActiveTab] = useState<'inbox' | 'cases' | 'kanban' | 'notary_bench' | 'metrics' | 'fast_actions'>('inbox');
   
   // Synchronize with external activeDashboardTab from Sidebar or other controls
   useEffect(() => {
     if (activeDashboardTab === 'inbox') setActiveTab('inbox');
     else if (activeDashboardTab === 'cases' || activeDashboardTab === 'dossiers') setActiveTab('cases');
+    else if (activeDashboardTab === 'kanban') setActiveTab('kanban');
     else if (activeDashboardTab === 'notary_bench' || activeDashboardTab === 'assermentation') setActiveTab('notary_bench');
     else if (activeDashboardTab === 'metrics' || activeDashboardTab === 'metriques') setActiveTab('metrics');
     else if (activeDashboardTab === 'fast_actions') setActiveTab('fast_actions');
   }, [activeDashboardTab]);
 
-  const handleTabSelect = (tab: 'inbox' | 'cases' | 'notary_bench' | 'metrics' | 'fast_actions') => {
+  const handleTabSelect = (tab: 'inbox' | 'cases' | 'kanban' | 'notary_bench' | 'metrics' | 'fast_actions') => {
     setActiveTab(tab);
     setActiveDashboardTab(tab);
   };
@@ -238,6 +239,18 @@ export function StaffOpsView() {
             >
               <Briefcase className="w-4 h-4" />
               2. Dossiers Immigration
+            </button>
+
+            <button
+              onClick={() => handleTabSelect('kanban')}
+              className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all ${
+                activeTab === 'kanban'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Kanban
             </button>
             <button
               onClick={() => handleTabSelect('notary_bench')}
@@ -648,6 +661,100 @@ export function StaffOpsView() {
       )}
 
       {/* SECTION 4: MÉTRIQUES DU BUREAU & FACTURATION */}
+
+      {/* KANBAN VIEW */}
+      {activeTab === 'kanban' && (
+        <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-6">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase text-purple-400 font-bold">
+            <LayoutDashboard className="w-4 h-4" />
+            Kanban - Tableaux de Suivi par Pôle
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-x-auto pb-4">
+            {/* Pôle Juridique Column */}
+            <div className="flex flex-col bg-slate-800/50 rounded-2xl p-4 min-w-[300px]">
+              <div className="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-2">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-purple-400" />
+                  Pôle Juridique
+                </h4>
+                <span className="bg-slate-700 text-xs px-2 py-0.5 rounded-full text-slate-300">3</span>
+              </div>
+              <div className="space-y-3">
+                <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 cursor-grab hover:border-purple-500/50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-purple-300">Asile I-589</span>
+                    <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 rounded">Urgent</span>
+                  </div>
+                  <p className="text-sm text-white font-medium mb-2">Dossier Lelo-Mumbanda</p>
+                  <div className="flex justify-between items-center text-xs text-slate-400">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3"/> J-2</span>
+                    <span>Alexandre K.</span>
+                  </div>
+                </div>
+                <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 cursor-grab hover:border-purple-500/50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-purple-300">Regroupement I-130</span>
+                  </div>
+                  <p className="text-sm text-white font-medium mb-2">Famille Diallo</p>
+                  <div className="flex justify-between items-center text-xs text-slate-400">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3"/> J-5</span>
+                    <span>Marie L.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pôle Finance Column */}
+            <div className="flex flex-col bg-slate-800/50 rounded-2xl p-4 min-w-[300px]">
+              <div className="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-2">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-400" />
+                  Pôle Finance
+                </h4>
+                <span className="bg-slate-700 text-xs px-2 py-0.5 rounded-full text-slate-300">2</span>
+              </div>
+              <div className="space-y-3">
+                <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 cursor-grab hover:border-emerald-500/50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-emerald-300">Taxes 1040</span>
+                  </div>
+                  <p className="text-sm text-white font-medium mb-2">Déclaration S. Kim</p>
+                  <div className="flex justify-between items-center text-xs text-slate-400">
+                    <span className="flex items-center gap-1 text-emerald-400"><CheckCircle2 className="w-3 h-3"/> Revue</span>
+                    <span>Jean P.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pôle Carrière Column */}
+            <div className="flex flex-col bg-slate-800/50 rounded-2xl p-4 min-w-[300px]">
+              <div className="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-2">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-blue-400" />
+                  Pôle Carrière
+                </h4>
+                <span className="bg-slate-700 text-xs px-2 py-0.5 rounded-full text-slate-300">1</span>
+              </div>
+              <div className="space-y-3">
+                <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 cursor-grab hover:border-blue-500/50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-blue-300">CV & Cover Letter</span>
+                  </div>
+                  <p className="text-sm text-white font-medium mb-2">Traduction M. Ndoye</p>
+                  <div className="flex justify-between items-center text-xs text-slate-400">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3"/> En cours</span>
+                    <span>Sophie T.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       {activeTab === 'metrics' && (
         <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-6">
           <div className="space-y-1">
