@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Compass, UserCheck, Shield, Bookmark, CheckSquare, Clock,
   FolderLock, Share2, Calendar, Stamp, CreditCard, ChevronRight, CheckCircle2,
   Sparkles, ArrowRight, ArrowLeft, Palette
+  , Settings
 } from "lucide-react";
 import { PageView } from "../../types";
 import { useUser, PersonaRole, UserRole } from "../../contexts/UserContext";
@@ -55,7 +56,9 @@ export function Sidebar({
     activePersona, 
     setActivePersona, 
     activeDashboardTab, 
-    setActiveDashboardTab 
+    setActiveDashboardTab,
+    openProfile,
+    currentUser
   } = useUser();
   const { theme, setTheme, setIsThemePanelOpen } = useTheme();
 
@@ -533,190 +536,28 @@ export function Sidebar({
 
             {/* Footer Section */}
             <div className="p-4 border-t border-white/5 bg-black/30 shrink-0 w-[310px] space-y-3">
-              {/* If on Landing Page: Show the Dedicated "Back-Office OS" Button with the 3 accesses */}
-              {!isDashboardMode ? (
-                <div className="p-3.5 rounded-2xl bg-gradient-to-b from-slate-900 via-slate-900 to-black border border-amber-500/35 shadow-xl space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                        <Lock className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-black text-white flex items-center gap-1.5">
-                          <span>Back-Office OS</span>
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        </div>
-                        <div className="text-[9px] text-slate-400 font-medium">
-                          Portail des 3 Dashboards
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      3 ACCÈS
-                    </span>
-                  </div>
-
-                  <div className="text-[10px] text-slate-300 leading-tight">
-                    Accédez aux dashboards selon votre profil :
-                  </div>
-
-                  {/* 3 Quick Role Access Pills */}
-                  <div className="grid grid-cols-3 gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAccess('visiteur')}
-                      className="p-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/25 border border-amber-500/30 text-center transition-all group"
-                      title="Ouvrir le Dashboard Découverte Visiteur"
-                    >
-                      <div className="text-[10px] font-bold text-amber-300 group-hover:scale-105 transition-transform">
-                        Visiteur
-                      </div>
-                      <div className="text-[7.5px] text-amber-400/80 font-mono">
-                        Découverte
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAccess('client')}
-                      className="p-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/25 border border-emerald-500/30 text-center transition-all group"
-                      title="Ouvrir le Dashboard Suivi Client"
-                    >
-                      <div className="text-[10px] font-bold text-emerald-300 group-hover:scale-105 transition-transform">
-                        Client
-                      </div>
-                      <div className="text-[7.5px] text-emerald-400/80 font-mono">
-                        Mon Suivi
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAccess('staff')}
-                      className="p-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/25 border border-purple-500/30 text-center transition-all group"
-                      title="Ouvrir le Cockpit Opérations Staff"
-                    >
-                      <div className="text-[10px] font-bold text-purple-300 group-hover:scale-105 transition-transform">
-                        Staff/Ops
-                      </div>
-                      <div className="text-[7.5px] text-purple-400/80 font-mono">
-                        Cockpit
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Primary Button: Open Back-Office Modal */}
-                  <button
-                    type="button"
-                    onClick={() => setIsAccessModalOpen(true)}
-                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-amber-500/20 cursor-pointer"
-                  >
-                    <Lock className="w-3 h-3" />
-                    <span>Ouvrir Back-Office OS</span>
-                    <ArrowRight className="w-3 h-3 ml-0.5" />
-                  </button>
-                </div>
-              ) : (
-                /* In Dashboard Mode: Show Status Summary Card */
-                <div className={`p-3 rounded-2xl border ${
-                  isVisitor 
-                    ? 'bg-gradient-to-r from-amber-950/40 to-slate-900 border-amber-500/30' 
-                    : isClient 
-                    ? 'bg-gradient-to-r from-emerald-950/40 to-slate-900 border-emerald-500/30' 
-                    : 'bg-gradient-to-r from-purple-950/40 to-slate-900 border-purple-500/30'
-                }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[9px] font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                      {isVisitor && <Sparkles className="w-3 h-3 text-amber-400" />}
-                      {isClient && <CheckCircle2 className="w-3 h-3 text-emerald-400" />}
-                      {isStaff && <Shield className="w-3 h-3 text-purple-400" />}
-                      {isVisitor ? 'Diagnostic & Actes' : isClient ? 'Statut Dossier' : 'File d\'Adjudication'}
-                    </span>
-                    <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                      isVisitor 
-                        ? 'bg-amber-500/20 text-amber-300' 
-                        : isClient 
-                        ? 'bg-emerald-500/20 text-emerald-300' 
-                        : 'bg-purple-500/20 text-purple-300'
-                    }`}>
-                      {isVisitor ? '$0 NET ACTIF' : isClient ? 'J-15 USCIS' : '1 NOID CRITIQUE'}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-300 leading-tight">
-                    {isVisitor 
-                      ? 'Testez l\'amortissement JaaS $300/an et téléchargez votre checklist de 12 pièces.'
-                      : isClient
-                      ? 'Convocation biométrique J-15 & 3 pièces scellées au coffre-fort 8 CFR.'
-                      : '4 scans SOP-LD05 en file d\'attente & 1 dossier Asile sous RFE 5 jours.'}
-                  </p>
-                </div>
-              )}
-
-              {/* Thème Actif & Sélecteur Rapide */}
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between shadow-inner">
-                <div className="flex items-center space-x-2">
-                  <button 
-                    type="button"
-                    onClick={() => setIsThemePanelOpen(true)}
-                    className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 hover:bg-amber-500/20 transition-colors"
-                    title="Ouvrir le panneau complet des thèmes"
-                  >
-                    <Palette className="w-3 h-3" />
-                  </button>
-                  <div>
-                    <div className="text-[10.5px] font-bold text-slate-200 capitalize leading-tight flex items-center gap-1">
-                      <span>{theme.replace('-', ' ')}</span>
-                    </div>
-                    <div className="text-[8.5px] text-slate-400">
-                      Thème persistant
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5 Dots for instant theme switching */}
-                <div className="flex items-center space-x-1.5">
-                  {THEME_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setTheme(opt.id)}
-                      title={`${opt.name} - ${opt.description}`}
-                      className={`w-4 h-4 rounded-full transition-all border ${
-                        theme === opt.id
-                          ? 'scale-125 border-white ring-2 ring-amber-400 shadow-sm'
-                          : 'border-white/30 hover:scale-110 opacity-60 hover:opacity-100'
-                      }`}
-                      style={{ backgroundColor: opt.accentColor }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* External Back-Office OS Production Link */}
-              <a
-                href="https://the-omk-mobile-back-office.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/40 rounded-2xl p-2.5 flex items-center justify-between transition-all group shadow-inner"
+              <button
+                type="button"
+                onClick={() => openProfile()}
+                className="w-full bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-2.5 flex items-center justify-between transition-all group shadow-inner cursor-pointer"
               >
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
-                    <ExternalLink className="w-3.5 h-3.5" />
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg">
+                    <UserCheck className="w-4 h-4" />
                   </div>
-                  <div>
-                    <div className="text-[11px] font-bold text-slate-200 group-hover:text-amber-400 transition-colors flex items-center">
-                      <span>Portail Dédié Vercel</span>
+                  <div className="text-left">
+                    <div className="text-[11px] font-bold text-slate-200 group-hover:text-white transition-colors">
+                      {currentUser.roleTitleFr.split('·')[0].trim()}
                     </div>
-                    <div className="text-[8px] text-slate-500 flex items-center space-x-1 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span>Production Mobile OS</span>
+                    <div className="text-[9px] text-blue-400 font-mono mt-0.5">
+                      Paramètres & Déconnexion
                     </div>
                   </div>
                 </div>
-                <span className="text-[9px] font-semibold bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-lg text-amber-400 border border-amber-500/30 group-hover:text-amber-300 transition-colors">
-                  Ouvrir
-                </span>
-              </a>
+                <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+                  <Settings className="w-3.5 h-3.5" />
+                </div>
+              </button>
             </div>
           </motion.aside>
         )}
