@@ -1,0 +1,27 @@
+# ADR-002 — Épure Ergonomique : Décharge du Header, Bouton Profil Solitaire ChatGPT & Cloisonnement des Paramètres
+
+## 1. Décisions d'Architecture UI/UX
+- **Décision 1 : Allègement du Header**
+  - Supprimer les liens textuels redondants au centre du Header.
+  - S'appuyer sur la navigation par Anchors déjà intégrée pour les sections de la Landing Page.
+  - Laisser respirer l'espace : Logo à gauche / Accès Back-Office épuré, Langue et Profil à droite.
+
+- **Décision 2 : Le "Bouton Profil Solitaire" en bas de Sidebar (Inspiration ChatGPT)**
+  - Retirer immédiatement le pavé de sélection de profil et le switch Glassmorphism de la Sidebar principale.
+  - Positionner un unique bouton épuré en bas de Sidebar affichant l'utilisateur connecté.
+  - Au clic : Déclencher l'ouverture du `SettingsModal` (avec onglets Général, Rôles & Accès Démo pour le développement, Thème, et Déconnexion).
+
+- **Décision 3 : Éradication du Lien Vercel Externe**
+  - Supprimer le bouton "Portail Dédié Vercel (Production Mobile OS)".
+  - Le point d'entrée Back-Office ouvre directement l'environnement interne selon le profil authentifié.
+
+## 2. Spécifications Techniques pour Jules
+1. `src/components/layout/Header.tsx` : Alléger la barre supérieure et rééquilibrer les marges.
+2. `src/components/layout/Sidebar.tsx` :
+   - Nettoyer le panneau inférieur des contrôles de debug.
+   - Intégrer le composant `UserProfileButton` solitaire en bas.
+   - Créer `src/components/settings/SettingsModal.tsx` inspiré de la vue ChatGPT Settings.
+3. `src/App.tsx` : Raccorder le déclenchement du modal de paramètres et s'assurer que le routage Back-Office dynamique reste intact.
+4. **Critères d'acceptation :**
+   - `bun run build` et `tsc --noEmit` passent à 100% (0 erreur).
+   - Ergonomie conforme aux captures : Header aéré, Sidebar épurée, paramètres accessibles au clic sur le bouton profil.
