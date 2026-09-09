@@ -129,24 +129,8 @@ export function Header({ currentPage, setCurrentPage, onOpenModal, isSidebarOpen
           </button>
         </div>
 
-        {/* CENTER: SECTIONS DE LA PAGE D'ACCUEIL */}
-        <nav className="hidden lg:flex items-center bg-slate-100/80 rounded-full px-2 py-1 border border-slate-200/80 shadow-inner gap-0.5">
-          {HOME_SECTIONS.map((link, idx) => (
-            <a 
-              key={idx} 
-              href={link.href} 
-              onClick={(e) => handleNavClick(e, link)}
-              className="text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white px-3.5 py-1.5 rounded-full transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap shadow-none hover:shadow-xs"
-            >
-              <span>{link.label}</span>
-              {link.badge && (
-                <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full uppercase ${link.badgeColor || 'bg-slate-200 text-slate-700'}`}>
-                  {link.badge}
-                </span>
-              )}
-            </a>
-          ))}
-        </nav>
+        {/* CENTER: NAVIGATION ÉPURÉE */}
+        <div className="hidden lg:flex flex-1"></div>
 
         {/* RIGHT CONTROLS: Themes, Language, Back-Office OS, User Profile */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
