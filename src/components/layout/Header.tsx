@@ -102,15 +102,15 @@ export function Header({ currentPage, setCurrentPage, onOpenModal, isSidebarOpen
         
         {/* LEFT: Menu Toggle + Brand Logo / Hub Status */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-          {(!isSidebarOpen || isMobile) && (
-            <button 
-              onClick={toggleSidebar}
-              className="p-2 bg-white rounded-full text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors shrink-0"
-              title="Ouvrir le menu latéral"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="p-2 mr-2 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+            aria-label="Ouvrir le menu de navigation"
+            title="Menu de navigation"
+          >
+            <Menu className="w-5 h-5 text-amber-400" />
+          </button>
           
           <button 
             onClick={() => {
