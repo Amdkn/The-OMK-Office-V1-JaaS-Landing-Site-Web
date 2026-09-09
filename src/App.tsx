@@ -545,26 +545,31 @@ export function DashboardLayout({
       {/* Anchor Navigation */}
       <AnchorNav sections={getNavAnchors()} />
 
-      {/* Role-Conditioned Sidebar Wrapper */}
-      {currentPage === 'dashboard' && (
-            <div
-              className={`
-                fixed inset-y-4 left-4 z-50 shrink-0
-                lg:static lg:inset-auto lg:h-full lg:translate-x-0
-                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-[150%] lg:hidden'}
-              `}
-            >
-              <Sidebar
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                isOpen={isSidebarOpen}
-                setIsOpen={setIsSidebarOpen}
-                isMobile={isMobile}
-                menuSections={menuSections}
-                activeRole={activePersona}
-              />
-            </div>
-      )}
+      {/* Role-Conditioned Sidebar Wrapper - Available on all pages */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className={`
+              fixed inset-y-4 left-4 z-50 shrink-0
+              ${currentPage === 'dashboard' ? 'lg:static lg:inset-auto lg:h-full lg:translate-x-0' : 'lg:fixed lg:inset-y-4 lg:left-4 shadow-2xl'}
+            `}
+          >
+            <Sidebar
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              isOpen={isSidebarOpen}
+              setIsOpen={setIsSidebarOpen}
+              isMobile={isMobile}
+              menuSections={menuSections}
+              activeRole={activePersona}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area - Large Nested Clay/Glass Container */}
       <div className="flex-1 flex flex-col theme-main-content relative z-0 transition-all duration-500 w-full max-w-full overflow-hidden">
@@ -607,10 +612,18 @@ export function DashboardLayout({
         </div>
       </div>
 
-      {/* Overlay for mobile sidebar */}
-      {isSidebarOpen && isMobile && (
+      {/* Overlay backdrop when sidebar is open outside of permanent dashboard layout */}
+      {isSidebarOpen && currentPage !== 'dashboard' && (
         <div 
-          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Overlay for mobile sidebar on dashboard */}
+      {isSidebarOpen && isMobile && currentPage === 'dashboard' && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
