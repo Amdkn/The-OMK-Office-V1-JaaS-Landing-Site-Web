@@ -106,7 +106,7 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer" aria-label="Fermer la fenêtre"
             >
               <X className="w-4 h-4" />
             </button>

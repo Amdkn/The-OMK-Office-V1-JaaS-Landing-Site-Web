@@ -426,7 +426,7 @@ export function ClientServicesView() {
                   </div>
                 </div>
 
-                <button className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors">
+                <button aria-label="Télécharger le document" className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors">
                   <Download className="w-4 h-4" />
                 </button>
               </div>

@@ -67,7 +67,7 @@ export function BackOfficeAccessModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+              className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors" aria-label="Fermer la fenêtre"
             >
               <X className="w-5 h-5" />
             </button>

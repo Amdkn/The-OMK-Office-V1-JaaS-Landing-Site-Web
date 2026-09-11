@@ -691,7 +691,7 @@ export function StaffOperationsView() {
                   <div className="font-bold text-white">Formulaire I-589 scellé (LELO-JM)</div>
                   <div className="text-slate-400 text-[11px] font-mono mt-0.5">Certifié 8 CFR § 1003.33 · 28 Pages PDF</div>
                 </div>
-                <button className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300">
+                <button aria-label="Télécharger le document" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300">
                   <Download className="w-4 h-4" />
                 </button>
               </div>
@@ -701,7 +701,7 @@ export function StaffOperationsView() {
                   <div className="font-bold text-white">Déclaration Fiscale 1040-NR (GARCIA)</div>
                   <div className="text-slate-400 text-[11px] font-mono mt-0.5">ITIN Assigné W-7 · Cachet Bureau Cincinnati</div>
                 </div>
-                <button className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300">
+                <button aria-label="Télécharger le document" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300">
                   <Download className="w-4 h-4" />
                 </button>
               </div>

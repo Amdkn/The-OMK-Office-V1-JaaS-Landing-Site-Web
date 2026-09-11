@@ -502,6 +502,7 @@ export function MobileOSView() {
                         onClick={triggerFaceId}
                         className="h-11 rounded-full bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 transition-all flex items-center justify-center border border-blue-500/30"
                         title="FaceID"
+                        aria-label="S'authentifier via FaceID"
                       >
                         <Fingerprint className="w-5 h-5" />
                       </button>
@@ -775,6 +776,7 @@ export function MobileOSView() {
                             <button
                               onClick={handleSendMessage}
                               className="p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shrink-0"
+                              aria-label="Envoyer le message"
                             >
                               <Send className="w-3.5 h-3.5" />
                             </button>
