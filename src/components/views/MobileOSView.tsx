@@ -702,16 +702,16 @@ export function MobileOSView() {
                         >
                           <Scale className="w-5 h-5" />
                         </button>
-                        <button onClick={() => setActiveSystemApp('ai-chat')} className="p-2.5 rounded-2xl bg-blue-500 text-white shadow-md">
+                        <button onClick={() => setActiveSystemApp('ai-chat')} className="p-2.5 rounded-2xl bg-blue-500 text-white shadow-md" aria-label="Ouvrir le chat AI">
                           <MessageSquare className="w-5 h-5" />
                         </button>
-                        <button onClick={() => setActiveSystemApp('baas-status')} className="p-2.5 rounded-2xl bg-amber-500 text-white shadow-md">
+                        <button onClick={() => setActiveSystemApp('baas-status')} className="p-2.5 rounded-2xl bg-amber-500 text-white shadow-md" aria-label="Ouvrir le statut BaaS">
                           <Briefcase className="w-5 h-5" />
                         </button>
-                        <button onClick={() => setActiveSystemApp('treasury-widget')} className="p-2.5 rounded-2xl bg-emerald-500 text-white shadow-md">
+                        <button onClick={() => setActiveSystemApp('treasury-widget')} className="p-2.5 rounded-2xl bg-emerald-500 text-white shadow-md" aria-label="Ouvrir le widget de trésorerie">
                           <DollarSign className="w-5 h-5" />
                         </button>
-                        <button onClick={() => setActiveSystemApp('node-health')} className="p-2.5 rounded-2xl bg-slate-800 text-slate-300 shadow-md">
+                        <button onClick={() => setActiveSystemApp('node-health')} className="p-2.5 rounded-2xl bg-slate-800 text-slate-300 shadow-md" aria-label="Ouvrir l etat du noeud">
                           <Activity className="w-5 h-5" />
                         </button>
                       </div>

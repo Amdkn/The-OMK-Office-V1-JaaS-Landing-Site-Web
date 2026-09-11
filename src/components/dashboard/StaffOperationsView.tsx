@@ -661,7 +661,7 @@ export function StaffOperationsView() {
 
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-mono text-slate-400">{client.stage}</span>
-                    <button className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors">
+                    <button className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors" aria-label="Ouvrir le dossier du client">
                       Ouvrir Dossier
                     </button>
                   </div>
