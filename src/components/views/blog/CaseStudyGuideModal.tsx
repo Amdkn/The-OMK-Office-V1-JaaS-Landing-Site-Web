@@ -96,7 +96,7 @@ export function CaseStudyGuideModal({ isOpen, onClose }: CaseStudyGuideModalProp
           </div>
           <button 
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" aria-label="Fermer le guide"
           >
             <X className="w-5 h-5" />
           </button>
