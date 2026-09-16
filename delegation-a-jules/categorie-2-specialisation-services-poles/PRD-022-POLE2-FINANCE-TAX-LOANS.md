@@ -23,3 +23,15 @@ Fichiers cibles :
 * Fichier de test : `tests/workspace/financeSpecialization.test.ts`
 * Le calcul du ratio DTI est vérifié par rapport aux formules financières bancaires standard.
 * L'estimation fiscale W-2 est validée avec zéro divergence d'arrondi sur les centimes.
+
+
+## 5. Ownership Boundary
+Owns: contributions et calculateurs spécialisés Pôle 2. Must not own: Cash Matrix générique, registry ou compilateur 75.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-013, PRD-020 et PRD-026. Publie règles/configurations Pôle 2 comme plugins/contributions indépendantes.
+
+## 7. Parallel Development Gate
+Seuils DTI, fiscalité W-2/1099 et formules de remboursement exigent une source canonique/versionnée. Jules n'invente ni tranche, ni taux, ni seuil absent.
+
+Calcul monétaire déterministe en centimes/décimal. Tests avec cas de référence sourcés et gestion explicite de l'année fiscale/version de règle.

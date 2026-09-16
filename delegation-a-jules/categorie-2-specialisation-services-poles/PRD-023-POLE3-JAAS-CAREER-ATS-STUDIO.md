@@ -25,3 +25,15 @@ Fichiers cibles :
 * Fichier de test : `tests/workspace/careerSpecialization.test.ts`
 * Le score ATS reflète fidèlement la présence des mots-clés obligatoires de l'offre d'emploi.
 * Le rendu visuel du CV ne déborde jamais sur la page suivante lors de l'aperçu PDF.
+
+
+## 5. Ownership Boundary
+Owns: spécialisations JaaS/ATS/Mock Interview du Pôle 3. Must not own: Career Studio générique, affiliation 024, registry ou compilateur.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-014, PRD-020 et PRD-026. Publie capabilities ATS/interview et contributions Pôle 3.
+
+## 7. Parallel Development Gate
+Le score ATS doit publier sa formule/version et rester testable sans LLM. Génération de questions IA est un adapter optionnel avec fallback déterministe ou état indisponible explicite.
+
+Tests: scoring fixture, pagination/overflow preview, grille STAR, absence de dépendance directe à 021/022/024.

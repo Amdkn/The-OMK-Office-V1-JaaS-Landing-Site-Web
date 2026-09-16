@@ -21,3 +21,15 @@ Fichiers cibles :
 * Toute modification d'une ligne d'encaissement recalcule le solde final sans latence.
 * Le simulateur de runway réagit fidèlement aux mouvements des curseurs.
 * L'export génère des calculs arithmétiques vérifiés à 100 % (zéro erreur d'arrondi).
+
+
+## 5. Ownership Boundary
+Owns: archétype générique Cash Matrix, grille, simulations et facture générique. Must not own: règles fiscales/prêt spécialisées.
+
+## 6. Consumed / Published Contracts
+Implémente PRD-016 et session PRD-015/017. Publie calculs génériques déterministes et plugin Cash Matrix.
+
+## 7. Parallel Development Gate
+Développable indépendamment de 012/014. Calcul monétaire avec représentation décimale/centimes explicite; aucune dépendance au float naïf pour une exigence zéro erreur d'arrondi.
+
+Les formules fiscales/bancaires viennent de PRD-022 et sources canoniques. Tests par fixtures arithmétiques déterministes.

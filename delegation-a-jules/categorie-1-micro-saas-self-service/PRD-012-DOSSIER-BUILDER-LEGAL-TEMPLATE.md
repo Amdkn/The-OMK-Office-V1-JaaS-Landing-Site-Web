@@ -36,3 +36,15 @@ interface LegalDossierState {
 * L'ajout d'une pièce jointe non conforme (ex: exécutable ou fichier trop lourd) est rejeté immédiatement avec un message clair.
 * Tous les champs requis du formulaire sont validés par Zod avant de débloquer l'étape suivante.
 * La synthèse finale compile toutes les pièces attachées dans l'ordre canonique.
+
+
+## 5. Ownership Boundary
+Owns: plugin archétype Dossier Builder générique. Must not own: règles USCIS spécifiques, formulaires officiels ou shell.
+
+## 6. Consumed / Published Contracts
+Implémente PRD-016. Consomme PRD-015/017 pour session et PRD-003 pour patterns de champs. Publie un plugin, pas un nouveau workspace global.
+
+## 7. Parallel Development Gate
+Développable contre `FakeWorkspaceContext`. OCR réel et PDF officiel sont capabilities/adapters séparables; leur absence ne doit pas forcer une fausse implémentation.
+
+Toute règle USCIS spécialisée vient de PRD-021/source canonique. Tests génériques: étapes, pièces, validation, assemblage ordonné.

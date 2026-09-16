@@ -40,3 +40,15 @@ export function useServiceLauncher() {
 * Un utilisateur visiteur qui clique sur une carte voit s'afficher la pop-up de réservation/détails avec le tarif et les livrables.
 * Un utilisateur client connecté qui clique sur une carte voit s'afficher le Micro-SaaS Workspace.
 * Zéro régression sur les formulaires ou boutons de contact de la modal visiteur.
+
+
+## 5. Ownership Boundary
+Owns: décision `visitor -> modal` / `client -> workspace` et restauration du contexte catalogue. Must not own: auth implementation, modal, shell ou store métier.
+
+## 6. Consumed / Published Contracts
+Consomme un contrat utilisateur/role existant et l'API d'ouverture du workspace PRD-011. Publie `launchService` et résultat de routing déterministe.
+
+## 7. Parallel Development Gate
+Mocks canoniques `visitor`/`client`. Un rôle inconnu doit suivre une politique explicite fail-safe, jamais être assimilé silencieusement à client.
+
+Tests: modal visiteur intacte, workspace client, retour/scroll, aucune double ouverture.

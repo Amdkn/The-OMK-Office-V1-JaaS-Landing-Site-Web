@@ -22,3 +22,15 @@ Fichiers cibles :
 * Fichier de test : `tests/workspace/referralEngine.test.ts`
 * La validation bloque les adresses emails en doublon ou les numéros de téléphone mal formatés.
 * Le calcul des commissions s'incrémente rigoureusement de 50 $ par statut converti validé.
+
+
+## 5. Ownership Boundary
+Owns: capability referral/commission/video brief. Ce PRD est transverse et ne fait pas partie du cœur Career Studio PRD-023.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-020/026 pour s'enregistrer comme capability. Les providers vidéo/voix sont adapters externes remplaçables et ne sont pas requis pour le calcul referral.
+
+## 7. Parallel Development Gate
+Développable sans 023 et sans API HeyGen/Creatomate/11Labs réelle via adapter mock. `ref_code` doit être non prédictible si utilisé comme capacité d'attribution sensible.
+
+Commission: règle configurée, pas constante enfouie dans l'UI. Tests doublons, attribution idempotente, conversion unique et calcul commission.

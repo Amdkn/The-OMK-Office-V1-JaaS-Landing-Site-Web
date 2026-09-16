@@ -23,3 +23,15 @@ Fichiers cibles :
 * La modification d'un texte d'expérience met à jour le canvas en 0 ms sans flash ni lag.
 * Le calculateur ATS identifie les mots-clés manquants entre le CV et l'offre d'emploi saisie.
 * L'export document conserve la mise en page exacte visualisée à l'écran.
+
+
+## 5. Ownership Boundary
+Owns: archétype générique Career Studio, canvas CV, édition et surface ATS. Must not own: algorithmes spécialisés JaaS ou provider IA.
+
+## 6. Consumed / Published Contracts
+Implémente PRD-016 et session PRD-015/017. Publie plugin Career Studio et points d'extension ATS/IA.
+
+## 7. Parallel Development Gate
+Scoring et micro-actions IA doivent être injectables/mockables. `0 ms` signifie update local sans round-trip; mesurer rendu/rerenders plutôt que promettre latence physique nulle.
+
+PRD-023 possède les règles JaaS/ATS spécialisées. Tests: édition locale, preview, extension scoring et export stable.

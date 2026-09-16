@@ -25,3 +25,15 @@ Fichiers cibles :
 * Le conteneur se charge avec les données initiales du service passé en paramètre.
 * Le clic sur le bouton de fermeture démonte proprement l'atelier sans fuite de mémoire.
 * Le panneau latéral s'ouvre et se ferme avec une animation fluide à 60 fps sans masquer les zones de saisie obligatoires.
+
+
+## 5. Ownership Boundary
+Owns: layout shell, TopBar, canvas slot, drawer et lifecycle visuel. Must not own: state métier des archétypes ou persistence.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-016 `WorkspacePluginContract` et PRD-015 pour statut de session. Publie les slots/context nécessaires aux plugins.
+
+## 7. Parallel Development Gate
+Doit être testable avec `FakeWorkspacePlugin`; aucun import direct de 012/013/014. Budget UI local cible ~16 ms par interaction lorsque mesurable, plutôt que promesse littérale `0 ms`.
+
+Tests: responsive, accessibilité, close propre, plugin absent/failure boundary.

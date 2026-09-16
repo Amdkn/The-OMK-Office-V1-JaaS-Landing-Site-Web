@@ -25,3 +25,15 @@ Fichiers cibles :
 * Fichier de test : `tests/workspace/legalSpecialization.test.ts`
 * Un format d'A-Number erroné bloque immédiatement la soumission du dossier.
 * L'attestation OMK Translate contient toutes les mentions légales requises par les tribunaux et l'immigration.
+
+
+## 5. Ownership Boundary
+Owns: contributions/validateurs métier du Pôle 1 et adapters de preview/traduction. Must not own: registry engine, shell ou compilateur 75.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-012, PRD-020 et protocole PRD-026. Publie contributions Pôle 1 enregistrables indépendamment.
+
+## 7. Parallel Development Gate
+Les formats/mentions USCIS et attestations doivent provenir de sources canoniques fournies/vérifiées. Si une règle manque, créer un placeholder bloquant explicite; ne pas inventer une conformité.
+
+PDF officiel, QR et SHA-256 sont capabilities testables séparément. Tests métier fondés sur fixtures sourcées.

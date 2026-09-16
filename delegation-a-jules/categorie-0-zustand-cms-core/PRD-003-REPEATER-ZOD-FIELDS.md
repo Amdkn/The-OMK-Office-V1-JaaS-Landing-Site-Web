@@ -30,3 +30,15 @@ Fichiers cibles :
 * Le Repeater réagit instantanément à l'ajout ou à la suppression d'un enfant sans re-render des éléments frères.
 * La saisie dans un `CmsField` met à jour la propriété dans le store en 0 ms.
 * Les entrées invalides sont bloquées par la barrière Zod.
+
+
+## 5. Ownership Boundary
+Owns: champs répétables, validation Zod de field collections et opérations add/remove/reorder. Must not own: schéma CMS racine ou persistence.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-006 et actions PRD-001. Publie API de repeater et erreurs de validation typées; aucune définition parallèle d'`EngramNode`.
+
+## 7. Parallel Development Gate
+Fixtures: repeater vide, mono-item, multi-item, invalide. Tests: ordre stable, IDs uniques, validation avant commit et rollback logique en cas d'échec.
+
+> Les schémas métier spécialisés restent propriété de 021/022/023.

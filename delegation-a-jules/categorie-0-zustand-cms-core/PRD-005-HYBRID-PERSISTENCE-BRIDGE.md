@@ -19,3 +19,15 @@ Fichiers cibles :
 * Les données saisies dans le store sont récupérées à 100 % après rechargement de la page (IndexedDB).
 * L'export génère un payload JSON avec signature SHA-256 valide.
 * En cas de corruption des données locales, le système restaure l'état canonique sans planter.
+
+
+## 5. Ownership Boundary
+Owns: persistence/snapshots CMS et adaptateur de sync optionnel. Must not own: migrations (007) ni sessions workspace (015).
+
+## 6. Consumed / Published Contracts
+Consomme PRD-006/007. Publie hydrate/save/export/import CMS. Le namespace est `omk:cms:*` selon PRD-017.
+
+## 7. Parallel Development Gate
+Le Core fonctionne sans `/api/cms/sync`; cet endpoint est un adaptateur optionnel. Tests offline-first, corruption, migration avant hydration et absence d'écriture dans `omk:workspace:*`.
+
+> Une indisponibilité backend ne bloque jamais l'édition locale.

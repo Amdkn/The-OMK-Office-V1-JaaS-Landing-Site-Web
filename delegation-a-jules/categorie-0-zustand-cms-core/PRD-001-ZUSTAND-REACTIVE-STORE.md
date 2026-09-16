@@ -43,3 +43,15 @@ interface CmsStoreState {
 * `moveNode` déplace un service d'un pôle à un autre sans corrompre l'ordre des autres enfants.
 * `deleteNodeTree` supprime récursivement les enfants et nettoie les identifiants orphelins.
 * `undo` restaure l'état exact des nœuds avant la dernière mutation.
+
+
+## 5. Ownership Boundary
+Owns: implémentation Zustand du store et actions atomiques. Must not redefine: `EngramNode`, migrations, persistence ou UI.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-006. Publie uniquement les selectors/actions du store; les consommateurs n'accèdent pas directement à `nodes` pour muter l'état.
+
+## 7. Parallel Development Gate
+Développable avec fixtures PRD-006. Tests obligatoires: mutation atomique, immutabilité observable, absence d'orphelins/cycles après actions structurelles.
+
+> Toute mutation de contrat public requiert coordination PRD-006/007, pas un patch local.

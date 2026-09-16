@@ -23,3 +23,15 @@ Pour éliminer toute dette technique, coquille vide ou code fictif, le système 
 * Le test vérifie que `Object.keys(compiledServices).length === 75`.
 * Tous les 75 services passent avec succès la validation de leur schéma Zod respectif.
 * Aucun champ obligatoire n'est null, undefined ou vide.
+
+
+## 5. Ownership Boundary
+Owns: assemblage exhaustif des 75 configurations canoniques. Must not own: type registry, validateurs métier ou implémentation des plugins.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-020/026 et contributions 021/022/023/024. Publie uniquement `compiledServices` validé et rapports de compilation.
+
+## 7. Parallel Development Gate
+Développable d'abord contre fixtures PRD-026; finalisation en Wave E. Toute entrée doit correspondre à un service source de `msg2MatrixData.ts` tant que cette source reste canonique.
+
+Gate final: exactement 75 IDs uniques, aucune config vide, aucun import fantôme, schémas résolus, rapport des règles/placeholders réglementaires encore bloquants.

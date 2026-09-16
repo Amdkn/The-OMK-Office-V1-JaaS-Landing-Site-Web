@@ -50,3 +50,15 @@ export interface EngramNode {
 * Validation Zod stricte : un nœud sans `id`, `slug` ou `type` valide lève une exception descriptive.
 * Test de validation des propriétés dynamiques (types strings, numbers, booleans, objets imbriqués).
 * Test d'invariance : un nœud ne peut pas être son propre parent (`parentId !== id`).
+
+
+## 5. Ownership Boundary
+Owns: modèle conceptuel CMS, invariants de graphe et fondations local-first. Must not own: UI, persistence concrète, workspace client ou règles métier.
+
+## 6. Consumed / Published Contracts
+Publie le modèle conceptuel consommé et gelé techniquement par PRD-006. Toute évolution incompatible passe par PRD-007.
+
+## 7. Parallel Development Gate
+Jules peut développer 000 contre fixtures de graphe sans implémenter 001-005. Gate: invariants documentés, aucun type concurrent de `EngramNode`, aucun backend obligatoire.
+
+> Gouvernance: PRD-900 et PRD-006 priment pour les frontières d'intégration.

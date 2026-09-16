@@ -19,3 +19,15 @@ Fichiers cibles :
 * Un chemin `/legal/omk-translate/visa-b2` sélectionne avec exactitude le nœud correspondant.
 * Si un slug est inexistant, le résolveur renvoie un statut de fallback propre sans crash applicatif.
 * Le fil d'Ariane génère les liens corrects pour chaque niveau de l'arborescence.
+
+
+## 5. Ownership Boundary
+Owns: résolution/navigation de chemins CMS. Must not mutate: store, schéma, persistence ou composants métier.
+
+## 6. Consumed / Published Contracts
+Consomme PRD-006 et selectors publics de PRD-001. Publie des fonctions pures de résolution avec résultats typés `found/not_found/invalid_path`.
+
+## 7. Parallel Development Gate
+Utiliser fixtures d'arbres PRD-006 et mock du store. Tests: chemin valide, profondeur variable, ID absent, cycle/corruption détecté sans boucle infinie.
+
+> Aucun accès direct à une structure interne non publiée du store.

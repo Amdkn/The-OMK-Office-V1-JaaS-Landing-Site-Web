@@ -35,3 +35,15 @@ export interface ServiceSpecializationConfig {
 * Les 75 codes de services sont indexés dans le registre sans aucun manquant.
 * Tout appel à `getServiceSpecialization` pour un service valide retourne une configuration complète et typée.
 * Zéro doublon d'identifiant de service.
+
+
+## 5. Ownership Boundary
+Owns: types/API/lookup/validation structurelle du registry. Must not own: contenu des 75 entrées ni règles métier des pôles.
+
+## 6. Consumed / Published Contracts
+Suit PRD-026. Publie `ServiceSpecializationConfig` et `getServiceSpecialization`. PRD-025 consomme ces types sans les redéfinir.
+
+## 7. Parallel Development Gate
+Registry testable avec fixtures 026, sans attendre les 75 services. `Record<string, any>` doit être borné progressivement par types/config schemas publics plutôt que devenir un canal de données non validées.
+
+Tests: lookup O(1), ID inconnu typé, doublon rejeté, contribution invalide rejetée.

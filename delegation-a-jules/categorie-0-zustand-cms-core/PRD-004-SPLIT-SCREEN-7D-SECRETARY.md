@@ -20,3 +20,15 @@ Fichiers cibles :
 * Le volet vidéo charge la ressource associée au champ `visualSecretary.videoId` du nœud actif.
 * L'événement de fin de vidéo déclenche automatiquement le focus sur le premier champ requis du formulaire.
 * L'adaptation responsive passe sous les 768px sans cassure visuelle.
+
+
+## 5. Ownership Boundary
+Owns: expérience split-screen/7D Secretary et adaptation visuelle. Must not own: store CMS, persistence, règles métier ou provider IA.
+
+## 6. Consumed / Published Contracts
+Consomme selectors/actions publics 001-003. Publie composants UI et callbacks, sans exposer l'état interne du CMS.
+
+## 7. Parallel Development Gate
+Développable contre fixtures et mocks. Les animations utilisent un budget mesurable; `60 fps` est une cible de rendu, pas une garantie absolue sur tout matériel.
+
+Tests: montage/démontage, focus clavier, responsive, aucune mutation hors callbacks publics.
