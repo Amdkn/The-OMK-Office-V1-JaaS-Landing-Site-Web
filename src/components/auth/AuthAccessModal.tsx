@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   X, Lock, Shield, UserCheck, KeyRound, ArrowRight, 
-  AlertCircle, CheckCircle2, Building2, User, FileText
+  AlertCircle, CheckCircle2, Building2, User, UserPlus,
+  Sparkles, Check, ChevronRight
 } from "lucide-react";
-import { useUser } from "../../contexts/UserContext";
+import { useUser, UserRole } from "../../contexts/UserContext";
 
 interface AuthAccessModalProps {
   isOpen: boolean;
@@ -13,12 +14,15 @@ interface AuthAccessModalProps {
 }
 
 export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: AuthAccessModalProps) {
-  const { loginAsClient, loginAsStaff, currentRole, logout } = useUser();
+  const { loginAsClient, loginAsStaff, setRole, currentRole, logout } = useUser();
   const [activeTab, setActiveTab] = useState<'client' | 'staff'>(defaultTab);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   // Client form state
   const [clientId, setClientId] = useState("USCIS-CIN-2026-8841");
   const [clientPin, setClientPin] = useState("••••");
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
 
   // Staff form state
   const [staffPasscode, setStaffPasscode] = useState("");
@@ -37,7 +41,7 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
 
   const handleClientSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    loginAsClient(clientId);
+    loginAsClient(clientId || clientEmail);
     onClose();
   };
 
@@ -55,13 +59,9 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
     }
   };
 
-  const handleDemoFillClient = () => {
-    setClientId("USCIS-CIN-2026-8841");
-    setClientPin("1234");
-  };
-
-  const handleDemoFillStaff = () => {
-    setStaffPasscode("OMK-2026-STAFF");
+  const handleQuickDemoSwitch = (role: UserRole) => {
+    setRole(role);
+    onClose();
   };
 
   return (
@@ -92,13 +92,13 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
-                  <span>Portail d'Accès Sécurisé</span>
+                  <span>Portail d'Accès & Authentification</span>
                   <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                    SÉPARATION DES RÔLES
+                    OMK-AUTH-v1
                   </span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Authentification cloisonnée pour Bénéficiaires et Collaborateurs
+                  Sas sécurisé multi-tenant pour Bénéficiaires, Staff & Visiteurs
                 </p>
               </div>
             </div>
@@ -106,10 +106,67 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer" aria-label="Fermer la fenêtre"
+              className="p-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              aria-label="Fermer la fenêtre d'authentification"
             >
               <X className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Quick Demo Persona Switcher Pill Bar */}
+          <div className="p-3 bg-slate-950/80 border-b border-slate-800 space-y-1.5">
+            <div className="text-[10px] font-mono font-bold uppercase text-slate-400 flex items-center justify-between px-1">
+              <span className="flex items-center gap-1 text-amber-400">
+                <Sparkles className="w-3 h-3" /> Bascule Immédiate Profil Démo :
+              </span>
+              <span className="text-slate-500">1-Click Auth</span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => handleQuickDemoSwitch('admin')}
+                className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer border ${
+                  currentRole === 'admin'
+                    ? 'bg-purple-600 text-white border-purple-400 shadow-sm'
+                    : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                👑 Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemoSwitch('employer')}
+                className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer border ${
+                  currentRole === 'employer'
+                    ? 'bg-blue-600 text-white border-blue-400 shadow-sm'
+                    : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                💼 Staff
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemoSwitch('client')}
+                className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer border ${
+                  currentRole === 'client'
+                    ? 'bg-emerald-600 text-white border-emerald-400 shadow-sm'
+                    : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                👤 Client
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemoSwitch('visiteur')}
+                className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer border ${
+                  currentRole === 'visiteur'
+                    ? 'bg-slate-700 text-white border-slate-500 shadow-sm'
+                    : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                🌐 Visiteur
+              </button>
+            </div>
           </div>
 
           {/* Tab Selector: Client vs Staff */}
@@ -147,6 +204,31 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
             </button>
           </div>
 
+          {/* Mode Sub-Toggle: Connexion vs Inscription */}
+          <div className="flex items-center justify-between px-6 pt-4 text-xs font-bold">
+            <span className="text-slate-400 uppercase text-[10px] font-mono">Mode d'Accès :</span>
+            <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+              <button
+                type="button"
+                onClick={() => setAuthMode('login')}
+                className={`px-3 py-1 rounded-lg transition-all ${
+                  authMode === 'login' ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                Se Connacter
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMode('signup')}
+                className={`px-3 py-1 rounded-lg transition-all ${
+                  authMode === 'signup' ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                Créer un Compte
+              </button>
+            </div>
+          </div>
+
           {/* Modal Body */}
           <div className="p-5 sm:p-6 space-y-5">
             {/* CURRENT USER STATUS IF ALREADY LOGGED IN */}
@@ -172,28 +254,47 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
               </div>
             )}
 
-            {/* TAB 1: CLIENT AUTHENTICATION */}
+            {/* TAB 1: CLIENT AUTHENTICATION / INSCRIPTION */}
             {activeTab === 'client' && (
               <form onSubmit={handleClientSubmit} className="space-y-4">
                 <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-200 text-xs leading-relaxed space-y-1">
                   <div className="font-bold flex items-center gap-1.5 text-emerald-300">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Accès Bénéficiaires & Dossiers en Cours</span>
+                    <span>{authMode === 'login' ? "Connexion Espace Client" : "Inscription Nouvel Adhérent"}</span>
                   </div>
                   <p className="text-[11px] text-emerald-300/80">
-                    Consultez l'avancement de vos formulaires (I-589 / I-765), téléchargez vos actes scellés 8 CFR et suivez vos alertes USCIS.
+                    {authMode === 'login'
+                      ? "Consultez l'avancement de vos formulaires (I-589 / I-765), téléchargez vos actes scellés 8 CFR et suivez vos alertes USCIS."
+                      : "Ouvrez votre dossier au guichet de Cincinnati, bénéficiez de l'intake certifié et de l'abonnement JaaS ($300/an)."
+                    }
                   </p>
                 </div>
 
+                {authMode === 'signup' && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                      Nom Complet du Bénéficiaire
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      placeholder="Ex: Jean-Marc Lelo"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                    Numéro de Dossier USCIS ou E-mail
+                    {authMode === 'login' ? "Numéro de Dossier USCIS ou E-mail" : "Adresse E-mail du Bénéficiaire"}
                   </label>
                   <input
                     type="text"
                     required
-                    value={clientId}
-                    onChange={(e) => setClientId(e.target.value)}
+                    value={authMode === 'login' ? clientId : clientEmail}
+                    onChange={(e) => authMode === 'login' ? setClientId(e.target.value) : setClientEmail(e.target.value)}
                     placeholder="Ex: USCIS-CIN-2026-8841 ou jm.lelo@gmail.com"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder:text-slate-500 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                   />
@@ -217,23 +318,12 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] pt-1">
-                  <button
-                    type="button"
-                    onClick={handleDemoFillClient}
-                    className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 cursor-pointer"
-                  >
-                    Remplir avec le Dossier Démo (Jean-Marc Lelo)
-                  </button>
-                  <span className="text-slate-500 font-mono">Partition auth.uid()</span>
-                </div>
-
                 <button
                   type="submit"
                   className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all cursor-pointer"
                 >
-                  <UserCheck className="w-4 h-4" />
-                  <span>Accéder à Mon Espace Client</span>
+                  {authMode === 'login' ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                  <span>{authMode === 'login' ? "Accéder à Mon Espace Client" : "Valider mon Inscription Client"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
@@ -290,17 +380,6 @@ export function AuthAccessModal({ isOpen, onClose, defaultTab = 'client' }: Auth
                     <span>Habilitation vérifiée avec succès. Connexion au Cockpit...</span>
                   </div>
                 )}
-
-                <div className="flex items-center justify-between text-[11px] pt-1">
-                  <button
-                    type="button"
-                    onClick={handleDemoFillStaff}
-                    className="text-purple-400 hover:text-purple-300 underline underline-offset-2 cursor-pointer"
-                  >
-                    Insérer la Clé de Démo Staff (M. Alexandre K.)
-                  </button>
-                  <span className="text-slate-500 font-mono">RLS Niveau 4</span>
-                </div>
 
                 <button
                   type="submit"
