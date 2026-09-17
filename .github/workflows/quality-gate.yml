@@ -1,0 +1,56 @@
+name: PRD-030 Quality Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check for invalid *.test.* files
+        run: |
+          INVALID_TESTS=$(find tests -name "*.test.ts" -exec grep -L "describe" {} +)
+          if [ -n "$INVALID_TESTS" ]; then
+            echo "❌ Invalid test files found: $INVALID_TESTS"
+            sh -c 'exit 1'
+          fi
+
+      - name: Run Typecheck
+        run: bun run typecheck
+
+      - name: Run Lint
+        run: bun run lint
+
+      - name: Run Tests
+        run: bun run test:ci
+
+      - name: Run Build
+        run: bun run build
+
+      - name: Report Status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "QUALITY_GATE_STATUS=PASS" >> $GITHUB_ENV
+            echo "QUALITY_GATE_STATUS=PASS"
+          else
+            echo "QUALITY_GATE_STATUS=FAIL" >> $GITHUB_ENV
+            echo "QUALITY_GATE_STATUS=FAIL"
+            sh -c 'exit 1'
+          fi

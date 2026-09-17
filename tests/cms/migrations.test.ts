@@ -1,46 +1,43 @@
+import { describe, it, expect } from 'vitest';
 import { migrateCmsSnapshot } from '../../src/lib/cms/migrations';
 import { CURRENT_CMS_SCHEMA_VERSION } from '../../src/lib/cms/schemaVersion';
 import { canonicalValidSnapshot } from '../../src/lib/cms/fixtures';
 
-function assert(condition: boolean, message: string) {
-  if (!condition) {
-    throw new Error(`Assertion Failed: ${message}`);
-  }
-}
+describe('CMS Migrations', () => {
+  it('Deterministic current version migration / validation', () => {
+    const currentRes = migrateCmsSnapshot(canonicalValidSnapshot, CURRENT_CMS_SCHEMA_VERSION);
+    expect(currentRes.success).toBe(true);
+    expect(currentRes.snapshot?.schemaVersion).toBe(CURRENT_CMS_SCHEMA_VERSION);
+  });
 
-console.log("Running Migration Tests...");
+  it('Idempotency test: repeating migration on already up-to-date snapshot returns identical result', () => {
+    const currentRes = migrateCmsSnapshot(canonicalValidSnapshot, CURRENT_CMS_SCHEMA_VERSION);
+    if (!currentRes.snapshot) throw new Error("Snapshot missing");
 
-// 1. Deterministic current version migration / validation
-const currentRes = migrateCmsSnapshot(canonicalValidSnapshot, CURRENT_CMS_SCHEMA_VERSION);
-assert(currentRes.success === true, "Current version snapshot migration should succeed");
-assert(currentRes.snapshot?.schemaVersion === CURRENT_CMS_SCHEMA_VERSION, "Target schemaVersion must match");
+    const idempotentRes = migrateCmsSnapshot(currentRes.snapshot, CURRENT_CMS_SCHEMA_VERSION);
+    expect(idempotentRes.success).toBe(true);
+    expect(idempotentRes.snapshot).toEqual(currentRes.snapshot);
+  });
 
-// 2. Idempotency test: repeating migration on already up-to-date snapshot returns identical result
-const idempotentRes = migrateCmsSnapshot(currentRes.snapshot, CURRENT_CMS_SCHEMA_VERSION);
-assert(idempotentRes.success === true, "Repeated migration must be idempotent and succeed");
-assert(JSON.stringify(idempotentRes.snapshot) === JSON.stringify(currentRes.snapshot), "Snapshots must be identical");
+  it('No silent property deletion: custom/unknown node properties remain intact after migration', () => {
+    const snapshotWithUnknownProp = JSON.parse(JSON.stringify(canonicalValidSnapshot));
+    snapshotWithUnknownProp.nodes['pole-legal'].properties.customVendorExtension = {
+      customFieldA: "retained",
+      customFieldB: 100,
+    };
 
-// 3. No silent property deletion: custom/unknown node properties remain intact after migration
-const snapshotWithUnknownProp = JSON.parse(JSON.stringify(canonicalValidSnapshot));
-snapshotWithUnknownProp.nodes['pole-legal'].properties.customVendorExtension = {
-  customFieldA: "retained",
-  customFieldB: 100,
-};
+    const unknownPropRes = migrateCmsSnapshot(snapshotWithUnknownProp, CURRENT_CMS_SCHEMA_VERSION);
+    expect(unknownPropRes.success).toBe(true);
+    expect(unknownPropRes.snapshot?.nodes['pole-legal'].properties.customVendorExtension?.customFieldA).toBe("retained");
+  });
 
-const unknownPropRes = migrateCmsSnapshot(snapshotWithUnknownProp, CURRENT_CMS_SCHEMA_VERSION);
-assert(unknownPropRes.success === true, "Snapshot with unknown properties must migrate successfully");
-assert(
-  unknownPropRes.snapshot?.nodes['pole-legal'].properties.customVendorExtension?.customFieldA === "retained",
-  "Unknown properties must not be silently deleted during migration"
-);
+  it('Rejection of invalid snapshots or future versions', () => {
+    const futureSnapshot = {
+      ...canonicalValidSnapshot,
+      schemaVersion: 999,
+    };
 
-// 4. Rejection of invalid snapshots or future versions
-const futureSnapshot = {
-  ...canonicalValidSnapshot,
-  schemaVersion: 999,
-};
-
-const futureRes = migrateCmsSnapshot(futureSnapshot, CURRENT_CMS_SCHEMA_VERSION);
-assert(futureRes.success === false, "Future schema version must be rejected");
-
-console.log("✅ All Migration Tests Passed!");
+    const futureRes = migrateCmsSnapshot(futureSnapshot as any, CURRENT_CMS_SCHEMA_VERSION);
+    expect(futureRes.success).toBe(false);
+  });
+});
