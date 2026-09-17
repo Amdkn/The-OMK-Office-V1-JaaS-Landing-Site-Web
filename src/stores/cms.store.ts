@@ -1,10 +1,13 @@
 import { create } from 'zustand';
-import { EngramNode } from '../types/cms';
+import { EngramNode, CmsGraphSnapshot } from '../types/cms';
+import { CURRENT_CMS_SCHEMA_VERSION } from '../lib/cms/schemaVersion';
+import { saveCmsSnapshot, SyncState } from '../lib/storage/persistence';
 
 export interface CmsStoreState {
   nodes: Record<string, EngramNode>;
   rootIds: string[];
   activeNodeId: string | null;
+  syncState: SyncState;
   history: {
     past: Array<{ nodes: Record<string, EngramNode>, rootIds: string[] }>;
     future: Array<{ nodes: Record<string, EngramNode>, rootIds: string[] }>;
@@ -18,16 +21,41 @@ export interface CmsStoreState {
   setActiveNodeId: (id: string | null) => void;
   undo: () => void;
   redo: () => void;
+  hydrate: (snapshot: CmsGraphSnapshot) => void;
+  setSyncState: (state: SyncState) => void;
 }
+
+const triggerPersistence = (state: CmsStoreState, set: any) => {
+  const snapshot: CmsGraphSnapshot = {
+    schemaVersion: CURRENT_CMS_SCHEMA_VERSION,
+    nodes: state.nodes,
+    rootIds: state.rootIds,
+    updatedAt: new Date().toISOString()
+  };
+
+  set({ syncState: 'sync_pending' });
+  saveCmsSnapshot(snapshot).then(newState => {
+    set({ syncState: newState });
+  });
+};
 
 export const useCmsStore = create<CmsStoreState>((set, get) => ({
   nodes: {},
   rootIds: [],
   activeNodeId: null,
+  syncState: 'local_saved',
   history: {
     past: [],
     future: []
   },
+
+  setSyncState: (state) => set({ syncState: state }),
+
+  hydrate: (snapshot) => set({
+    nodes: snapshot.nodes,
+    rootIds: snapshot.rootIds,
+    syncState: 'local_saved'
+  }),
 
   setActiveNodeId: (id) => set({ activeNodeId: id }),
 
@@ -53,14 +81,16 @@ export const useCmsStore = create<CmsStoreState>((set, get) => ({
       newRootIds.push(newNode.id);
     }
 
-    set({
+    const nextState = {
       nodes: newNodes,
       rootIds: newRootIds,
       history: {
         past: [...state.history.past, { nodes: state.nodes, rootIds: state.rootIds }],
         future: []
       }
-    });
+    };
+    set(nextState);
+    triggerPersistence(get(), set);
   },
 
   updateNodeProperties: (id, properties) => {
@@ -78,13 +108,15 @@ export const useCmsStore = create<CmsStoreState>((set, get) => ({
       }
     };
 
-    set({
+    const nextState = {
       nodes: newNodes,
       history: {
         past: [...state.history.past, { nodes: state.nodes, rootIds: state.rootIds }],
         future: []
       }
-    });
+    };
+    set(nextState);
+    triggerPersistence(get(), set);
   },
 
   moveNode: (id, targetParentId, targetIndex) => {
@@ -137,14 +169,16 @@ export const useCmsStore = create<CmsStoreState>((set, get) => ({
       }
     }
 
-    set({
+    const nextState = {
       nodes: newNodes,
       rootIds: newRootIds,
       history: {
         past: [...state.history.past, { nodes: state.nodes, rootIds: state.rootIds }],
         future: []
       }
-    });
+    };
+    set(nextState);
+    triggerPersistence(get(), set);
   },
 
   deleteNodeTree: (id) => {
@@ -177,14 +211,16 @@ export const useCmsStore = create<CmsStoreState>((set, get) => ({
 
     deleteRecursively(id);
 
-    set({
+    const nextState = {
       nodes: newNodes,
       rootIds: newRootIds,
       history: {
         past: [...state.history.past, { nodes: state.nodes, rootIds: state.rootIds }],
         future: []
       }
-    });
+    };
+    set(nextState);
+    triggerPersistence(get(), set);
   },
 
   undo: () => {
@@ -202,6 +238,7 @@ export const useCmsStore = create<CmsStoreState>((set, get) => ({
         future: [{ nodes: state.nodes, rootIds: state.rootIds }, ...state.history.future]
       }
     });
+    triggerPersistence(get(), set);
   },
 
   redo: () => {
@@ -219,5 +256,6 @@ export const useCmsStore = create<CmsStoreState>((set, get) => ({
         future: newFuture
       }
     });
+    triggerPersistence(get(), set);
   }
 }));
