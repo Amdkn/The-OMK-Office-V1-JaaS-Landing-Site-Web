@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -12,10 +13,48 @@ async function startServer() {
   // Middleware for JSON parsing
   app.use(express.json());
 
+
+  // === OBSERVABILITY MIDDLEWARE ===
+  // 1. Correlation ID
+  app.use((req, res, next) => {
+    const correlationId = req.headers['x-correlation-id'] || crypto.randomUUID();
+    (req as any).correlationId = correlationId;
+    res.setHeader('X-Correlation-ID', correlationId);
+    next();
+  });
+
+  // 2. Structured Logging
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      // Filter out noisy health checks from general logs
+      if (!req.path.startsWith('/api/health')) {
+        console.log(JSON.stringify({
+          level: res.statusCode >= 400 ? 'error' : 'info',
+          method: req.method,
+          path: req.path,
+          status: res.statusCode,
+          durationMs: duration,
+          correlationId: (req as any).correlationId
+        }));
+      }
+    });
+    next();
+  });
+
   // === API ROUTES ===
+  // Readiness and liveness probes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", service: "OMK Web OS Core" });
   });
+  app.get("/api/health/live", (req, res) => {
+    res.json({ status: "ok" });
+  });
+  app.get("/api/health/ready", (req, res) => {
+    res.json({ status: "ok" });
+  });
+
 
   // Example API route for future extensions (database, Gemini, etc.)
   app.post("/api/echo", (req, res) => {
