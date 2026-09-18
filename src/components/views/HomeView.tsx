@@ -8,7 +8,7 @@ import { ShapeDivider } from "../ui/ShapeDivider"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { t } from "../../i18n/translations"
 
-export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: () => void, setCurrentPage: (page: PageView) => void }) {
+export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: (serviceId?: string) => void, setCurrentPage: (page: PageView) => void }) {
   const [referrals, setReferrals] = useState(3)
   const cost = 300
   const revenue = referrals * 50
@@ -107,7 +107,7 @@ export function HomeView({ onOpenModal, setCurrentPage }: { onOpenModal: () => v
 
       {/* CATALOGUE */}
       <div id="catalogue" className="relative z-10 bg-slate-50 pt-16 scroll-mt-28">
-        <ServicesCatalog onOpenBooking={() => onOpenModal()} />
+        <ServicesCatalog onOpenBooking={(id) => onOpenModal(id)} />
       </div>
 
       {/* GRILLE DES OFFRES - Glassmorphism Dark Mode (OLED) */}

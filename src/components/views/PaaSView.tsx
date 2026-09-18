@@ -5,7 +5,7 @@ import { ShapeDivider } from "../ui/ShapeDivider"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { t } from "../../i18n/translations"
 
-export function PaaSView({ onOpenModal }: { onOpenModal: () => void }) {
+export function PaaSView({ onOpenModal }: { onOpenModal: (serviceId?: string) => void }) {
   const [referrals, setReferrals] = useState(6)
   const cost = 1500
   const revenue = referrals * 250

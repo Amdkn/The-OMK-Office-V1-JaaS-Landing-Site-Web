@@ -1,16 +1,35 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { MSG2MatrixExplorer } from "./matrix/MSG2MatrixExplorer"
 import { ServiceItem } from "../types"
+import { useServiceLauncher } from "../hooks/useServiceLauncher"
 
 export function ServicesCatalog({ onOpenBooking }: { onOpenBooking?: (serviceId?: string) => void }) {
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null)
+  const { launchService, modalServiceId, closeModal } = useServiceLauncher()
+
+  // When modalServiceId is set by useServiceLauncher (meaning it's a visitor), pass to booking modal
+  useEffect(() => {
+    if (modalServiceId && onOpenBooking) {
+      onOpenBooking(modalServiceId)
+      closeModal()
+    }
+  }, [modalServiceId, onOpenBooking, closeModal])
+
+  const handleOpenBooking = (serviceId?: string) => {
+    if (serviceId) {
+      launchService(serviceId)
+    } else if (onOpenBooking) {
+      // Fallback
+      onOpenBooking()
+    }
+  }
 
   return (
     <section id="services" className="py-16 md:py-24 bg-slate-50 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <MSG2MatrixExplorer 
           onSelectService={(service) => setSelectedService(service)}
-          onOpenBooking={onOpenBooking}
+          onOpenBooking={handleOpenBooking}
         />
       </div>
     </section>

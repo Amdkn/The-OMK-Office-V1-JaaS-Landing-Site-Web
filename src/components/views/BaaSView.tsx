@@ -6,7 +6,7 @@ import { useLanguage } from "../../contexts/LanguageContext"
 import { t } from "../../i18n/translations"
 
 interface BaaSViewProps {
-  onOpenModal: () => void;
+  onOpenModal: (serviceId?: string) => void;
 }
 
 export function BaaSView({ onOpenModal }: BaaSViewProps) {

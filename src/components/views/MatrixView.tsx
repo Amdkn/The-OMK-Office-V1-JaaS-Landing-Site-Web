@@ -1,8 +1,27 @@
+import { useEffect } from "react"
 import { MSG2MatrixExplorer } from "../matrix/MSG2MatrixExplorer"
 import { TricephaleFlowSimulator } from "../jaas/TricephaleFlowSimulator"
 import { Sparkles, Layers, ShieldCheck, Calculator, GraduationCap } from "lucide-react"
+import { useServiceLauncher } from "../../hooks/useServiceLauncher"
 
 export function MatrixView({ onOpenModal }: { onOpenModal: (serviceId?: string) => void }) {
+  const { launchService, modalServiceId, closeModal } = useServiceLauncher()
+
+  useEffect(() => {
+    if (modalServiceId) {
+      onOpenModal(modalServiceId)
+      closeModal()
+    }
+  }, [modalServiceId, onOpenModal, closeModal])
+
+  const handleLaunchService = (serviceId?: string) => {
+    if (serviceId) {
+      launchService(serviceId)
+    } else {
+      onOpenModal()
+    }
+  }
+
   return (
     <div className="flex flex-col w-full bg-slate-50 min-h-screen font-sans">
       
@@ -64,7 +83,7 @@ export function MatrixView({ onOpenModal }: { onOpenModal: (serviceId?: string) 
       {/* Interactive Matrix Explorer */}
       <section id="matrix-explorer" className="pb-20 relative z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <MSG2MatrixExplorer onOpenBooking={onOpenModal} />
+          <MSG2MatrixExplorer onOpenBooking={handleLaunchService} />
         </div>
       </section>
 

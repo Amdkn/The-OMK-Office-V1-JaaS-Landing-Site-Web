@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, Filter, CheckCircle2, Clock, DollarSign, MapPin, 
@@ -31,6 +31,40 @@ export function MSG2MatrixExplorer({
   const [jaasFilterOnly, setJaasFilterOnly] = useState<boolean>(highlightJaaSOnly);
   const [viewMode, setViewMode] = useState<'matrix' | 'cards' | 'table'>('matrix');
   const [activeActModal, setActiveActModal] = useState<ServiceItem | null>(null);
+
+  // Parse URL query parameters for deep linking
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Check for search parameter
+    const searchParam = params.get('search');
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+
+    // Check for pole parameter
+    const poleParam = params.get('pole');
+    if (poleParam) {
+      // Find matching pole
+      const matchedPole = MSG2_POLES.find(p => p.id === poleParam || p.code.toString() === poleParam || p.shortEn.toLowerCase().includes(poleParam.toLowerCase()));
+      if (matchedPole) {
+        setSelectedPole(matchedPole.id);
+      } else if (poleParam.toUpperCase() === 'ALL') {
+        setSelectedPole('ALL');
+      }
+    }
+
+    // Check for specific service to open modal
+    const serviceParam = params.get('service');
+    if (serviceParam) {
+      const matchedService = MSG2_ALL_SERVICES.find(s => s.id === serviceParam || s.id.replace('ACT-', '') === serviceParam);
+      if (matchedService) {
+        setActiveActModal(matchedService);
+        // Optionally update pole to match the service
+        setSelectedPole(matchedService.pole);
+      }
+    }
+  }, []);
 
   // Filtered services
   const filteredServices = useMemo(() => {
@@ -96,8 +130,20 @@ export function MSG2MatrixExplorer({
     }
   };
 
+  // Sync URL with search/filter state
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (searchQuery) url.searchParams.set('search', searchQuery);
+    else url.searchParams.delete('search');
+
+    if (selectedPole !== 'ALL') url.searchParams.set('pole', selectedPole);
+    else url.searchParams.delete('pole');
+
+    window.history.replaceState({}, '', url);
+  }, [searchQuery, selectedPole]);
+
   return (
-    <div className="w-full">
+    <div className="w-full" id="matrix-explorer">
       {/* MATRIX CONTROLS HEADER */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 mb-8">
         
@@ -287,8 +333,36 @@ export function MSG2MatrixExplorer({
         </div>
       </div>
 
+      {/* EMPTY STATE */}
+      {filteredServices.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-3xl border border-slate-200 text-center mb-8 shadow-sm">
+          <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-4">
+            <Search className="w-8 h-8" />
+          </div>
+          <h4 className="text-lg font-bold text-slate-900 mb-2">
+            {lang === 'fr' ? 'Aucun service trouvé' : 'No services found'}
+          </h4>
+          <p className="text-sm text-slate-500 max-w-md mb-6">
+            {lang === 'fr'
+              ? 'Essayez de modifier vos critères de recherche ou de sélectionner un autre pôle pour découvrir nos services.'
+              : 'Try modifying your search criteria or selecting another pole to discover our services.'}
+          </p>
+          <button
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedPole('ALL');
+              setSelectedSubCategory('ALL');
+              setJaasFilterOnly(false);
+            }}
+            className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-colors"
+          >
+            {lang === 'fr' ? 'Réinitialiser les filtres' : 'Reset filters'}
+          </button>
+        </div>
+      )}
+
       {/* MATRIX VIEW (Organized by 3 Poles and 5 Subcategories) */}
-      {viewMode === 'matrix' && (
+      {viewMode === 'matrix' && filteredServices.length > 0 && (
         <div className="space-y-10">
           {MSG2_POLES.filter(p => selectedPole === 'ALL' || p.id === selectedPole).map((pole) => {
             const poleServices = filteredServices.filter(s => s.pole === pole.id);
@@ -414,7 +488,7 @@ export function MSG2MatrixExplorer({
       )}
 
       {/* CARDS GRID VIEW */}
-      {viewMode === 'cards' && (
+      {viewMode === 'cards' && filteredServices.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => (
             <div
@@ -603,7 +677,7 @@ export function MSG2MatrixExplorer({
                   }}
                   className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm transition-all shadow-md flex items-center justify-center gap-2"
                 >
-                  <span>{lang === 'fr' ? `Réserver cet Acte ($${activeActModal.baseFeeUsd})` : `Book this Act ($${activeActModal.baseFeeUsd})`}</span>
+                  <span>{lang === 'fr' ? `Lancer / Réserver ($${activeActModal.baseFeeUsd})` : `Launch / Book ($${activeActModal.baseFeeUsd})`}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 

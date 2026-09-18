@@ -10,7 +10,7 @@ import { ThemeSelector } from "./ThemeSelector"
 interface HeaderProps {
   currentPage: PageView;
   setCurrentPage?: (page: PageView) => void;
-  onOpenModal: () => void;
+  onOpenModal: (serviceId?: string) => void;
   isSidebarOpen: boolean;
   toggleSidebar?: () => void;
   isMobile?: boolean;
