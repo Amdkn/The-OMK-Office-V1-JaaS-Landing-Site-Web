@@ -4,8 +4,10 @@ import {
   CheckCircle2, Clock, ArrowRight, Download, MessageSquare, Phone, 
   Share2, Shield, Calendar, Sparkles, Check, ChevronRight, UserCheck, 
   FileText, ExternalLink, Star, Briefcase, Plus, AlertCircle, 
-  FolderLock, Copy, AlertTriangle, Stamp, Printer, Eye, Lock
+  FolderLock, Copy, AlertTriangle, Stamp, Printer, Eye, Lock, LayoutDashboard, Calculator
 } from "lucide-react";
+import { useWorkspaceStore } from "../../store/workspaceStore";
+import { getServiceSpecialization } from "../../lib/services/specializationRegistry";
 
 interface TimelineStep {
   id: number;
@@ -113,7 +115,8 @@ const VAULT_DOCS: VaultDocument[] = [
 
 export function ClientHubView() {
   const { currentUser, activeDashboardTab, setActiveDashboardTab } = useUser();
-  const [activeTab, setActiveTab] = useState<'tracker' | 'vault' | 'ambassador' | 'deadlines'>('tracker');
+  const { openWorkspace } = useWorkspaceStore();
+  const [activeTab, setActiveTab] = useState<'tracker' | 'vault' | 'ambassador' | 'deadlines' | 'ateliers'>('tracker');
   const [activeDossier, setActiveDossier] = useState<'i589' | 'i130' | 'tax1040'>('i589');
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -123,9 +126,10 @@ export function ClientHubView() {
     else if (activeDashboardTab === 'vault') setActiveTab('vault');
     else if (activeDashboardTab === 'ambassador' || activeDashboardTab === 'ambassadeur') setActiveTab('ambassador');
     else if (activeDashboardTab === 'deadlines' || activeDashboardTab === 'echeances' || activeDashboardTab === 'timeline') setActiveTab('deadlines');
+    else if (activeDashboardTab === 'ateliers') setActiveTab('ateliers');
   }, [activeDashboardTab]);
 
-  const handleTabSelect = (tab: 'tracker' | 'vault' | 'ambassador' | 'deadlines') => {
+  const handleTabSelect = (tab: 'tracker' | 'vault' | 'ambassador' | 'deadlines' | 'ateliers') => {
     setActiveTab(tab);
     setActiveDashboardTab(tab);
   };
@@ -211,6 +215,17 @@ export function ClientHubView() {
             >
               <Calendar className="w-4 h-4" />
               4. Échéances & Alertes
+            </button>
+            <button
+              onClick={() => handleTabSelect('ateliers')}
+              className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all ${
+                activeTab === 'ateliers'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              5. Mes Ateliers Actifs
             </button>
           </div>
         </div>
@@ -671,6 +686,67 @@ export function ClientHubView() {
             ))}
           </div>
 
+        </div>
+      )}
+
+      {/* SECTION 5: MES ATELIERS ACTIFS (WORKSPACES) */}
+      {activeTab === 'ateliers' && (
+        <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase text-blue-400 font-bold">
+              <LayoutDashboard className="w-4 h-4" />
+              Espace de Travail & Ateliers
+            </div>
+            <h3 className="text-xl font-bold text-white">
+              Vos Sessions Actives
+            </h3>
+            <p className="text-xs text-slate-400">
+              Reprenez vos formulaires, questionnaires ou brouillons là où vous les avez laissés.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { id: '1.1-2', status: "Brouillon", lastEdited: "Il y a 2 heures", icon: FileText, color: 'blue', colorClassBg: "bg-blue-500/20", colorClassText: "text-blue-400", colorClassBtnBg: "bg-blue-600", colorClassBtnHover: "hover:bg-blue-500" },
+              { id: 'tax1040', status: "En attente de pièces", lastEdited: "Hier à 14h30", icon: Calculator, color: 'emerald', colorClassBg: "bg-emerald-500/20", colorClassText: "text-emerald-400", colorClassBtnBg: "bg-emerald-600", colorClassBtnHover: "hover:bg-emerald-500" },
+              { id: 'i589', status: "Prêt pour révision", lastEdited: "Il y a 3 jours", icon: FileText, color: 'blue', colorClassBg: "bg-blue-500/20", colorClassText: "text-blue-400", colorClassBtnBg: "bg-blue-600", colorClassBtnHover: "hover:bg-blue-500" },
+            ].map((workspace) => {
+              const spec = getServiceSpecialization(workspace.id);
+              const title = spec ? spec.titleFr : workspace.id;
+              const archetype = spec ? spec.archetype : 'Unknown';
+              return (
+              <div key={workspace.id} className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl ${workspace.colorClassBg} ${workspace.colorClassText} flex items-center justify-center`}>
+                      <workspace.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white leading-tight">{title}</h4>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{archetype}</div>
+                    </div>
+                  </div>
+                  <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-bold">
+                    {workspace.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-slate-800/80">
+                  <span className="text-[10px] text-slate-500 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    Modifié : {workspace.lastEdited}
+                  </span>
+                  <button
+                    onClick={() => openWorkspace(workspace.id)}
+                    className={`px-4 py-2 rounded-xl ${workspace.colorClassBtnBg} ${workspace.colorClassBtnHover} text-white font-bold text-xs flex items-center gap-2 transition-colors`}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    Reprendre l'Atelier
+                  </button>
+                </div>
+              </div>
+            )})}
+          </div>
         </div>
       )}
 
