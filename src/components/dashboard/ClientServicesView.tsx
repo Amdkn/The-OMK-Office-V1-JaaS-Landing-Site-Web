@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUser } from "../../contexts/UserContext";
+import { calculateProgress, Milestone } from "../../lib/progress/progressEngine";
 import { 
   CheckCircle2, Clock, ArrowRight, Download, MessageSquare, Phone, 
   Share2, Shield, Calendar, Sparkles, Check, ChevronRight, UserCheck, 
@@ -73,6 +74,16 @@ const MARKETPLACE_SERVICES: ServiceItem[] = [
 export function ClientServicesView() {
   const { currentUser } = useUser();
   const [activeTab, setActiveTab] = useState<'progress' | 'marketplace' | 'vault' | 'referral'>('progress');
+
+  // Hardcoded steps mapped to dynamic Milestones
+  const milestones: Milestone[] = [
+    { id: 1, status: 'completed' },
+    { id: 2, status: 'completed' },
+    { id: 3, status: 'current' },
+    { id: 4, status: 'upcoming' },
+    { id: 5, status: 'upcoming' }
+  ];
+  const progressPercent = calculateProgress(milestones);
   const [requestedServices, setRequestedServices] = useState<string[]>([]);
   const [referralCopied, setReferralCopied] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
@@ -197,7 +208,7 @@ export function ClientServicesView() {
               <div className="flex items-center gap-2 self-start sm:self-auto">
                 <span className="text-xs font-bold text-slate-400">Progression globale :</span>
                 <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono font-bold text-xs">
-                  65% (Étape 3 sur 5)
+                  {progressPercent}% (Étape 3 sur 5)
                 </span>
               </div>
             </div>
@@ -205,7 +216,10 @@ export function ClientServicesView() {
             {/* Visual 5-step milestone pipeline (Coursera / Uber timeline) */}
             <div className="space-y-4">
               <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                <div className="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 h-full w-[65%] rounded-full transition-all duration-700"></div>
+                <div
+                  className="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-700"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3 pt-2">

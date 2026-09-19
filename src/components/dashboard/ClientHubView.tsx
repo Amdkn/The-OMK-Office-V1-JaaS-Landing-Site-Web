@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../contexts/UserContext";
+import { calculateProgress, Milestone } from "../../lib/progress/progressEngine";
 import { 
   CheckCircle2, Clock, ArrowRight, Download, MessageSquare, Phone, 
   Share2, Shield, Calendar, Sparkles, Check, ChevronRight, UserCheck, 
@@ -116,6 +117,13 @@ export function ClientHubView() {
   const [activeTab, setActiveTab] = useState<'tracker' | 'vault' | 'ambassador' | 'deadlines'>('tracker');
   const [activeDossier, setActiveDossier] = useState<'i589' | 'i130' | 'tax1040'>('i589');
   const [copiedLink, setCopiedLink] = useState(false);
+
+  // Convert timeline steps to Milestones to calculate progress deterministically
+  const milestones: Milestone[] = UBER_TRACKER_STEPS.map(step => ({
+    id: step.id,
+    status: step.status as Milestone['status']
+  }));
+  const progressPercent = calculateProgress(milestones);
 
   // Synchronize with external activeDashboardTab from Sidebar or other controls
   useEffect(() => {
@@ -314,10 +322,10 @@ export function ClientHubView() {
             <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col space-y-3">
               <div className="flex justify-between items-center text-sm font-bold text-white">
                 <span>Progression du Dossier</span>
-                <span className="text-emerald-400">40%</span>
+                <span className="text-emerald-400">{progressPercent}%</span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-2.5">
-                <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: '40%' }}></div>
+                <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: `${progressPercent}%` }}></div>
               </div>
               <div className="grid grid-cols-5 text-center text-[10px] font-mono text-slate-400 mt-2">
                 <div className="text-emerald-400 font-bold">Intake</div>
