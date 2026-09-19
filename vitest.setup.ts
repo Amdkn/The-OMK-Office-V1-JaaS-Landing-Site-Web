@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import 'fake-indexeddb/auto';
 import * as idb from 'idb-keyval';
 // Setup dummy indexedDB for jsdom tests globally to prevent reference errors if they import idb directly
