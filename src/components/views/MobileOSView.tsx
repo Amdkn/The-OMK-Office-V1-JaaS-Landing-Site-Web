@@ -11,6 +11,7 @@ import { Button } from "@/src/components/ui/button"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { LegalVaultApp } from "../mobile/LegalVaultApp"
 import { appEventBus } from "@/src/lib/appEventBus"
+import { NotificationAdapter } from "../notifications/NotificationAdapter"
 
 interface SessionState {
   role: 'founder' | 'baas_partner' | 'paas_operator';
@@ -281,6 +282,7 @@ export function MobileOSView() {
 
   return (
     <div className="w-full bg-slate-950 min-h-screen text-slate-200 py-10 px-4 sm:px-6 lg:px-8">
+      <NotificationAdapter />
       
       {/* SECTION HEADER */}
       <div id="mobile-preview" className="max-w-7xl mx-auto text-center mb-10">

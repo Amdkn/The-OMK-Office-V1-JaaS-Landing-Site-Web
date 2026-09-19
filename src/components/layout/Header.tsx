@@ -6,6 +6,8 @@ import { t } from "../../i18n/translations"
 import { useUser } from "../../contexts/UserContext"
 import { UserProfileButton } from "../profile/UserProfileButton"
 import { ThemeSelector } from "./ThemeSelector"
+import { NotificationBell } from "../notifications/NotificationBell"
+import { NotificationAdapter } from "../notifications/NotificationAdapter"
 
 interface HeaderProps {
   currentPage: PageView;
@@ -134,6 +136,9 @@ export function Header({ currentPage, setCurrentPage, onOpenModal, isSidebarOpen
 
         {/* RIGHT CONTROLS: Themes, Language, Back-Office OS, User Profile */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <NotificationAdapter />
+          <NotificationBell />
+
           {/* Sélecteur de Thèmes Compact */}
           <ThemeSelector />
 
