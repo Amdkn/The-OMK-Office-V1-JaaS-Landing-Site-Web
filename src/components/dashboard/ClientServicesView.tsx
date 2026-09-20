@@ -5,6 +5,7 @@ import {
   Share2, Shield, Calendar, Sparkles, Check, ChevronRight, UserCheck, 
   FileText, ExternalLink, Star, Briefcase, Plus, AlertCircle
 } from "lucide-react";
+import { useDossierStore } from "../../stores/dossier/dossierStore";
 
 interface ServiceItem {
   id: string;
@@ -46,7 +47,7 @@ const MARKETPLACE_SERVICES: ServiceItem[] = [
   },
   {
     id: "interview-prep",
-    title: "Simulation d'Entretien USCIS & Révision Orale",
+    title: "Simulation d'Entretien & Révision Orale",
     category: "Pôle 1 · Légal",
     price: 95,
     duration: "Session 1h en direct",
@@ -73,6 +74,11 @@ const MARKETPLACE_SERVICES: ServiceItem[] = [
 export function ClientServicesView() {
   const { currentUser } = useUser();
   const [activeTab, setActiveTab] = useState<'progress' | 'marketplace' | 'vault' | 'referral'>('progress');
+  const { getProgress, dossiers, activeDossierId } = useDossierStore();
+  const dossierId = activeDossierId || 'i589';
+  const trackerSteps = dossiers[dossierId] || [];
+  const progressPercent = getProgress(dossierId);
+  const currentStep = trackerSteps.find(s => s.status === 'current') || trackerSteps.find(s => s.status === 'upcoming') || trackerSteps[trackerSteps.length - 1];
   const [requestedServices, setRequestedServices] = useState<string[]>([]);
   const [referralCopied, setReferralCopied] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
@@ -108,7 +114,7 @@ export function ClientServicesView() {
               </span>
             </div>
             <div className="text-xs text-slate-400 font-mono mt-0.5 flex items-center gap-2">
-              <span>Dossier N° USCIS-CIN-2026-8841</span>
+              <span>Dossier Interne OMK</span>
               <span>•</span>
               <span className="text-blue-400">Hub Physique Cincinnati</span>
             </div>
@@ -197,70 +203,47 @@ export function ClientServicesView() {
               <div className="flex items-center gap-2 self-start sm:self-auto">
                 <span className="text-xs font-bold text-slate-400">Progression globale :</span>
                 <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono font-bold text-xs">
-                  65% (Étape 3 sur 5)
+                  {progressPercent}% (Étape {currentStep?.id || 0} sur {trackerSteps.length})
                 </span>
               </div>
             </div>
 
-            {/* Visual 5-step milestone pipeline (Coursera / Uber timeline) */}
+            {/* Visual milestone pipeline */}
             <div className="space-y-4">
               <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                <div className="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 h-full w-[65%] rounded-full transition-all duration-700"></div>
+                <div className="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-700" style={{ width: `${progressPercent}%` }}></div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3 pt-2">
-                
-                {/* Step 1 */}
-                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-emerald-500/30 relative">
-                  <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold mb-1">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Étape 1 · Terminé</span>
-                  </div>
-                  <div className="font-bold text-white text-xs">Diagnostic & Collecte</div>
-                  <p className="text-[11px] text-slate-400 mt-1">Audit des pièces d'identité et historique d'entrée.</p>
-                </div>
+                {trackerSteps.map((step) => {
+                  const isDone = step.status === 'completed';
+                  const isCurrent = step.status === 'current';
 
-                {/* Step 2 */}
-                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-emerald-500/30 relative">
-                  <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold mb-1">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Étape 2 · Validé</span>
-                  </div>
-                  <div className="font-bold text-white text-xs">Traduction 8 CFR</div>
-                  <p className="text-[11px] text-slate-400 mt-1">SLA 45m respecté. Actes scellés avec certification légale.</p>
-                </div>
-
-                {/* Step 3 - Current */}
-                <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-500/60 shadow-lg shadow-blue-500/10 relative">
-                  <span className="absolute -top-2 right-2 px-2 py-0.5 rounded-full bg-blue-500 text-white font-mono text-[9px] font-black uppercase animate-pulse">
-                    En cours
-                  </span>
-                  <div className="flex items-center gap-2 text-blue-400 text-xs font-bold mb-1">
-                    <Clock className="w-4 h-4 animate-spin" />
-                    <span>Étape 3 · Révision</span>
-                  </div>
-                  <div className="font-bold text-white text-xs">Assemblage & Affidavits</div>
-                  <p className="text-[11px] text-slate-300 mt-1">Contrôle final par Sarah Jenkins avant scellement.</p>
-                </div>
-
-                {/* Step 4 */}
-                <div className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-800/80 opacity-60">
-                  <div className="flex items-center gap-2 text-slate-500 text-xs font-bold mb-1">
-                    <span>Étape 4 · À venir</span>
-                  </div>
-                  <div className="font-bold text-slate-300 text-xs">Dépôt USCIS</div>
-                  <p className="text-[11px] text-slate-500 mt-1">Numéro de tracking et récépissé de dépôt officiel.</p>
-                </div>
-
-                {/* Step 5 */}
-                <div className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-800/80 opacity-60">
-                  <div className="flex items-center gap-2 text-slate-500 text-xs font-bold mb-1">
-                    <span>Étape 5 · Finale</span>
-                  </div>
-                  <div className="font-bold text-slate-300 text-xs">Biométrie & EAD</div>
-                  <p className="text-[11px] text-slate-500 mt-1">Délivrance de la carte de permis de travail.</p>
-                </div>
-
+                  return (
+                    <div key={step.id} className={`p-3.5 rounded-xl border relative ${
+                      isCurrent ? 'bg-blue-950/40 border-blue-500/60 shadow-lg shadow-blue-500/10' :
+                      isDone ? 'bg-slate-950/60 border-emerald-500/30' :
+                      'bg-slate-950/40 border-slate-800/80 opacity-60'
+                    }`}>
+                      {isCurrent && (
+                        <span className="absolute -top-2 right-2 px-2 py-0.5 rounded-full bg-blue-500 text-white font-mono text-[9px] font-black uppercase animate-pulse">
+                          En cours
+                        </span>
+                      )}
+                      <div className={`flex items-center gap-2 text-xs font-bold mb-1 ${
+                        isCurrent ? 'text-blue-400' :
+                        isDone ? 'text-emerald-400' :
+                        'text-slate-500'
+                      }`}>
+                        {isDone ? <CheckCircle2 className="w-4 h-4" /> :
+                         isCurrent ? <Clock className="w-4 h-4 animate-spin" /> : null}
+                        <span>Étape {step.id} · {isDone ? 'Terminé' : isCurrent ? 'Révision' : 'À venir'}</span>
+                      </div>
+                      <div className={`font-bold text-xs ${isDone || isCurrent ? 'text-white' : 'text-slate-300'}`}>{step.label.replace(/^\d+\.\s*/, '')}</div>
+                      <p className={`text-[11px] mt-1 ${isCurrent ? 'text-slate-300' : isDone ? 'text-slate-400' : 'text-slate-500'}`}>{step.sublabel}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -401,7 +384,7 @@ export function ClientServicesView() {
 
           <div className="space-y-3">
             {[
-              { title: "Traduction Certifiée 8 CFR § 1003.33 (Acte de Naissance)", date: "15/08/2025", size: "2.4 MB", tag: "Officiel USCIS" },
+              { title: "Traduction Certifiée (Acte de Naissance)", date: "15/08/2025", size: "2.4 MB", tag: "Interne" },
               { title: "Récépissé de Dépôt Frais JaaS Annuel ($300)", date: "01/09/2025", size: "340 KB", tag: "Facture Acquittée" },
               { title: "Projet de Formulaire I-589 Complété & Scellé", date: "02/10/2025", size: "4.1 MB", tag: "Brouillon Juridique" },
               { title: "Attestation Notariée d'Hébergement Cincinnati", date: "24/09/2025", size: "1.1 MB", tag: "Sceau Ohio Apposé" }
