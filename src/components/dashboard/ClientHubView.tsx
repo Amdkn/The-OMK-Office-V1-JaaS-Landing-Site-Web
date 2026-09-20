@@ -6,56 +6,7 @@ import {
   FileText, ExternalLink, Star, Briefcase, Plus, AlertCircle, 
   FolderLock, Copy, AlertTriangle, Stamp, Printer, Eye, Lock
 } from "lucide-react";
-
-interface TimelineStep {
-  id: number;
-  label: string;
-  sublabel: string;
-  status: "completed" | "current" | "upcoming";
-  timestamp?: string;
-  officerNote?: string;
-}
-
-const UBER_TRACKER_STEPS: TimelineStep[] = [
-  {
-    id: 1,
-    label: "1. Documents reçus",
-    sublabel: "Scans originaux intake validés",
-    status: "completed",
-    timestamp: "24 Août · 14h15",
-    officerNote: "Acte de naissance & passeport scannés au guichet physique de Cincinnati."
-  },
-  {
-    id: 2,
-    label: "2. Traduction certifiée",
-    sublabel: "Norme légale 8 CFR § 1003.33",
-    status: "completed",
-    timestamp: "27 Août · 10h30",
-    officerNote: "Attestation formelle de compétence et d'exactitude bilingue rédigée et scellée."
-  },
-  {
-    id: 3,
-    label: "3. Revue Notariée",
-    sublabel: "Sceau Notary Public Ohio",
-    status: "current",
-    timestamp: "En cours aujourd'hui",
-    officerNote: "Apposition du sceau officiel par Sarah Jenkins (Notary Public n° OH-2024-884)."
-  },
-  {
-    id: 4,
-    label: "4. Envoi & Dépôt USCIS",
-    sublabel: "Liasse scellée avec accusé I-797C",
-    status: "upcoming",
-    officerNote: "Expédition par courrier sécurisé USPS Certified Mail avec numéro de suivi."
-  },
-  {
-    id: 5,
-    label: "5. Biométrie & EAD",
-    sublabel: "Prise d'empreintes & Permis de travail",
-    status: "upcoming",
-    officerNote: "Convocation au centre d'application biométrique (ASC) de Cincinnati."
-  }
-];
+import { useDossierStore } from "../../stores/dossier/dossierStore";
 
 interface VaultDocument {
   id: string;
@@ -115,7 +66,13 @@ export function ClientHubView() {
   const { currentUser, activeDashboardTab, setActiveDashboardTab } = useUser();
   const [activeTab, setActiveTab] = useState<'tracker' | 'vault' | 'ambassador' | 'deadlines'>('tracker');
   const [activeDossier, setActiveDossier] = useState<'i589' | 'i130' | 'tax1040'>('i589');
+  const { getProgress, dossiers } = useDossierStore();
   const [copiedLink, setCopiedLink] = useState(false);
+
+  const trackerSteps = dossiers[activeDossier] || [];
+  const progressPercent = getProgress(activeDossier);
+  const currentStep = trackerSteps.find(s => s.status === 'current') || trackerSteps.find(s => s.status === 'upcoming') || trackerSteps[trackerSteps.length - 1];
+  const isEnvoiCompleted = trackerSteps.find(s => s.id === 4)?.status === 'completed';
 
   // Synchronize with external activeDashboardTab from Sidebar or other controls
   useEffect(() => {
@@ -290,22 +247,28 @@ export function ClientHubView() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  {currentStep?.status === 'current' ? (
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  ) : (
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                  )}
                   <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">
-                    Suivi Temps Réel · Étape 3 sur 5
+                    Suivi Temps Réel · Étape {currentStep?.id} sur {trackerSteps.length}
                   </span>
                 </div>
                 <h3 className="text-xl font-bold text-white mt-1">
-                  Revue Notariée & Légalisation en cours
+                  {currentStep?.label}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Dossier inspecté et contresigné au bureau de Cincinnati · Date prévisionnelle de dépôt : <strong>Dans 48 heures</strong>
+                  Délai de traitement : <strong>Selon délais standards</strong>
                 </p>
               </div>
 
               <div className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-right">
                 <div className="text-[10px] font-mono uppercase text-slate-400">Numéro de récépissé</div>
-                <div className="text-sm font-mono font-black text-amber-400">OH-USCIS-994821</div>
+                <div className="text-sm font-mono font-black text-slate-500">
+                  En attente de récépissé
+                </div>
               </div>
             </div>
 
@@ -314,15 +277,15 @@ export function ClientHubView() {
             <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col space-y-3">
               <div className="flex justify-between items-center text-sm font-bold text-white">
                 <span>Progression du Dossier</span>
-                <span className="text-emerald-400">40%</span>
+                <span className="text-emerald-400">{progressPercent}%</span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-2.5">
-                <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: '40%' }}></div>
+                <div className="bg-emerald-500 h-2.5 rounded-full transition-all duration-700" style={{ width: `${progressPercent}%` }}></div>
               </div>
               <div className="grid grid-cols-5 text-center text-[10px] font-mono text-slate-400 mt-2">
                 <div className="text-emerald-400 font-bold">Intake</div>
                 <div className="text-emerald-400 font-bold">Traduction</div>
-                <div className="text-white font-bold">USCIS</div>
+                <div className="text-white font-bold">Gouvernement</div>
                 <div>Biométrie</div>
                 <div>Décision</div>
               </div>
@@ -339,7 +302,7 @@ export function ClientHubView() {
 
             {/* Step-by-Step Uber Timeline */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
-              {UBER_TRACKER_STEPS.map((step, idx) => {
+              {trackerSteps.map((step, idx) => {
                 const isDone = step.status === 'completed';
                 const isCurrent = step.status === 'current';
                 const isUpcoming = step.status === 'upcoming';
@@ -609,38 +572,22 @@ export function ClientHubView() {
               Échéancier & Calendrier Procédural
             </div>
             <h3 className="text-xl font-bold text-white">
-              Alertes Délais Stricts (USCIS & IRS)
+              Rendez-vous & Échéances Internes
             </h3>
             <p className="text-xs text-slate-400">
-              Surveillance automatique des délais d'expiration pour ne manquer aucun rendez-vous critique.
+              Surveillance automatique de vos rendez-vous avec l'équipe OMK.
             </p>
           </div>
 
           <div className="space-y-3">
             {[
               {
-                id: "alert-1",
-                level: "warning",
-                title: "Fenêtre d'ouverture Asylum Clock (Jour 150)",
-                date: "Dans 14 jours · 17 Septembre 2026",
-                desc: "Votre horloge d'asile atteindra 150 jours. Dépôt automatique du formulaire I-765 (EAD) préparé par Sarah Jenkins.",
-                badge: "PRIORITÉ ÉLEVÉE"
-              },
-              {
                 id: "alert-2",
                 level: "info",
                 title: "Rendez-vous de vérification au guichet de Cincinnati",
-                date: "Jeudi 10 Septembre à 14h00 EST",
+                date: "À planifier",
                 desc: "Revue physique des originaux d'état civil avec le juriste avant scellé définitif.",
                 badge: "AU BUREAU OMK"
-              },
-              {
-                id: "alert-3",
-                level: "normal",
-                title: "Échéance déclaration d'acompte fiscal IRS",
-                date: "15 Octobre 2026",
-                desc: "Déclaration trimestrielle sous numéro ITIN W-7 pour votre activité indépendante.",
-                badge: "PÔLE 2 FISCAL"
               }
             ].map((al) => (
               <div
